@@ -1,0 +1,43 @@
+{
+  "reportFormat": "magika-performance-v1",
+  "configuration": {
+    "scenario": "path",
+    "warmupRounds": 5,
+    "measurementRounds": 10,
+    "corpusRepeatsPerRound": 10,
+    "itemsPerRound": 690,
+    "batchSize": 32,
+    "intraOpThreads": 1,
+    "callers": 1,
+    "predictionMode": "HIGH_CONFIDENCE",
+    "maxStreamBytes": 67108864,
+    "graphExecution": "SEQUENTIAL / NO_OPT / stable LayerNorm reductions"
+  },
+  "javaRuntime": "21.0.11+10-1-24.04.2-Ubuntu",
+  "javaVendor": "Ubuntu",
+  "javaHome": "/usr/lib/jvm/java-21-openjdk-amd64",
+  "jvmArguments": [
+    "-Xms128m",
+    "-Xmx128m",
+    "-XX:+AlwaysPreTouch",
+    "-XX:+UseSerialGC",
+    "-XX:ActiveProcessorCount\u003d4"
+  ],
+  "availableProcessors": 4,
+  "os": "Linux 6.8.0-136-generic amd64",
+  "nativeOrtVersion": "1.30.0",
+  "model": {
+    "sdkVersion": "0.1.0",
+    "modelVersion": "standard_v3_3",
+    "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+    "assetDigests": {
+      "model.onnx": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+      "config.min.json": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+      "content_types_kb.min.json": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d"
+    }
+  },
+  "sdkJarSha256": "0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3",
+  "corpusManifestSha256": "a7de97b903d30cd48cc34d07364635e988bca35996210f55831b0f39b23f1731",
+  "corpusFiles": 69,
+  "corpusBytes": 1490089
+}

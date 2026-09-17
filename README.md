@@ -473,6 +473,13 @@ verify full-call draining, untouched rejection, reentrancy, interrupted and
 concurrent closers, per-call tensor/result ownership, initialization cleanup and
 release failures. See the [concurrency verification record](docs/verification-issue-7.md).
 
+The [standalone measurement tool](benchmarks/README.md) runs complete public SDK
+Path, InputStream, lazy batch and shared-instance workloads. The
+[versioned performance and resource report](docs/performance/issue-8-v1.md)
+includes measured throughput, separately defined latency metrics, Java heap and
+process observations, raw evidence and reproduction commands. Its figures apply
+to the recorded corpus and environment; they are not a fixed performance SLA.
+
 Before upgrading the model or its companion configuration/metadata, pin the new
 asset set and upstream reference sources together, then rerun compatibility
 acceptance:

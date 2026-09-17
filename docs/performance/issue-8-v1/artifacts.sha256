@@ -1,0 +1,6 @@
+0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3  target/magika-0.1.0.jar
+a6c68ebe82531f4a06dfeaa9748ccfa2f301ade6eba80341f88583caa2bf819e  benchmarks/target/identification-1.0.0.jar
+a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc  benchmarks/target/dependency/error_prone_annotations-2.41.0.jar
+dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0  benchmarks/target/dependency/gson-2.13.2.jar
+0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3  benchmarks/target/dependency/magika-0.1.0.jar
+57d8cedf6f0c8fd6d50ed65c17bf9939f55a4512f4a1f3e732023d258f262ac6  benchmarks/target/dependency/onnxruntime-1.30.0.jar

@@ -1,0 +1,123 @@
+2026-09-17T15:42:42+00:00
+uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),27(sudo)
+PRETTY_NAME="Ubuntu 24.04.4 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.4 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+Linux r42qokyw.vm 6.8.0-136-generic #136-Ubuntu SMP PREEMPT_DYNAMIC Wed Jul  1 21:53:05 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           46 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  4
+On-line CPU(s) list:                     0-3
+Vendor ID:                               GenuineIntel
+Model name:                              Intel Xeon Processor (Skylake, IBRS)
+CPU family:                              6
+Model:                                   85
+Thread(s) per core:                      2
+Core(s) per socket:                      2
+Socket(s):                               1
+Stepping:                                4
+BogoMIPS:                                4988.28
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 arat vnmi pku ospke avx512_vnni
+Virtualization:                          VT-x
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               128 KiB (4 instances)
+L1i cache:                               128 KiB (4 instances)
+L2 cache:                                8 MiB (2 instances)
+L3 cache:                                16 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-3
+Vulnerability Gather data sampling:      Unknown: Dependent on hypervisor status
+Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+Vulnerability Itlb multihit:             KVM: Mitigation: VMX disabled
+Vulnerability L1tf:                      Mitigation; PTE Inversion; VMX conditional cache flushes, SMT vulnerable
+Vulnerability Mds:                       Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Meltdown:                  Mitigation; PTI
+Vulnerability Mmio stale data:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Mitigation; IBRS
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; IBRS; IBPB conditional; STIBP conditional; RSB filling; PBRSB-eIBRS Not affected; BHI SW loop, KVM SW loop
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Vmscape:                   Not affected
+               total        used        free      shared  buff/cache   available
+Mem:      8326942720  2805006336  2779156480   141488128  3205775360  5521936384
+Swap:     4106219520  2452160512  1654059008
+Filesystem     Type 1K-blocks     Used Available Use% Mounted on
+/dev/vda2      xfs   52360192 43676972   8683220  84% /
+openjdk version "21.0.11" 2026-04-21
+OpenJDK Runtime Environment (build 21.0.11+10-1-24.04.2-Ubuntu)
+OpenJDK 64-Bit Server VM (build 21.0.11+10-1-24.04.2-Ubuntu, mixed mode, sharing)
+5fbbeabf64041ffe4c4ef5d196eba20ddf85ded5
+M  README.md
+A  benchmarks/.gitignore
+A  benchmarks/README.md
+A  benchmarks/pom.xml
+A  benchmarks/run.sh
+A  benchmarks/src/main/java/net/zerocloud/benchmarks/Corpus.java
+A  benchmarks/src/main/java/net/zerocloud/benchmarks/IdentificationBenchmark.java
+A  benchmarks/src/main/java/net/zerocloud/benchmarks/Measurements.java
+A  benchmarks/src/main/java/net/zerocloud/benchmarks/ResourceMeasurement.java
+A  docs/performance/issue-8-v1-verification.tar.gz
+A  docs/performance/issue-8-v1.md
+A  docs/performance/issue-8-v1/artifacts.sha256
+A  docs/performance/issue-8-v1/audit-summary.json
+A  docs/performance/issue-8-v1/batch.log
+A  docs/performance/issue-8-v1/batch/corpus.csv
+A  docs/performance/issue-8-v1/batch/latencies.csv
+A  docs/performance/issue-8-v1/batch/metadata.json
+A  docs/performance/issue-8-v1/batch/resources.csv
+A  docs/performance/issue-8-v1/batch/rounds.csv
+A  docs/performance/issue-8-v1/batch/summary.json
+A  docs/performance/issue-8-v1/commands.txt
+A  docs/performance/issue-8-v1/environment.txt
+A  docs/performance/issue-8-v1/path.log
+A  docs/performance/issue-8-v1/path/corpus.csv
+A  docs/performance/issue-8-v1/path/latencies.csv
+A  docs/performance/issue-8-v1/path/metadata.json
+A  docs/performance/issue-8-v1/path/resources.csv
+A  docs/performance/issue-8-v1/path/rounds.csv
+A  docs/performance/issue-8-v1/path/summary.json
+A  docs/performance/issue-8-v1/resources.log
+A  docs/performance/issue-8-v1/resources/metadata.json
+A  docs/performance/issue-8-v1/resources/resources.csv
+A  docs/performance/issue-8-v1/shared.log
+A  docs/performance/issue-8-v1/shared/corpus.csv
+A  docs/performance/issue-8-v1/shared/latencies.csv
+A  docs/performance/issue-8-v1/shared/metadata.json
+A  docs/performance/issue-8-v1/shared/resources.csv
+A  docs/performance/issue-8-v1/shared/rounds.csv
+A  docs/performance/issue-8-v1/shared/summary.json
+A  docs/performance/issue-8-v1/sources.sha256
+A  docs/performance/issue-8-v1/stream.log
+A  docs/performance/issue-8-v1/stream/corpus.csv
+A  docs/performance/issue-8-v1/stream/latencies.csv
+A  docs/performance/issue-8-v1/stream/metadata.json
+A  docs/performance/issue-8-v1/stream/resources.csv
+A  docs/performance/issue-8-v1/stream/rounds.csv
+A  docs/performance/issue-8-v1/stream/summary.json
+?? .scratch/
+?? AGENTS.md
+?? CONTEXT.md
+?? docs/adr/
+?? docs/agents/
+?? docs/design-session.md
+?? docs/upstream-findings.md
+/sys/fs/cgroup/cpuset.cpus.effective
+0-3

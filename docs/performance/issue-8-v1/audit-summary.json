@@ -1,0 +1,197 @@
+{
+  "sdkSha256": "0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3",
+  "matrix": {
+    "8": {
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "1.8.0_492-8u492-ga~us2-0ubuntu1~24.04.1-b09"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-8-openjdk-amd64/jre"
+        ]
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "1.8.0_492-8u492-ga~us2-0ubuntu1~24.04.1-b09"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-8-openjdk-amd64/jre"
+        ]
+      }
+    },
+    "17": {
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "17.0.19+10-1-24.04.2-Ubuntu"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-17-openjdk-amd64"
+        ]
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "17.0.19+10-1-24.04.2-Ubuntu"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-17-openjdk-amd64"
+        ]
+      }
+    },
+    "21": {
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "21.0.11+10-1-24.04.2-Ubuntu"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-21-openjdk-amd64"
+        ]
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "runtimeVersions": [
+          "21.0.11+10-1-24.04.2-Ubuntu"
+        ],
+        "javaHomes": [
+          "/usr/lib/jvm/java-21-openjdk-amd64"
+        ]
+      }
+    }
+  },
+  "performance": {
+    "path": {
+      "items": 6900,
+      "modelResults": 6800,
+      "ruleResults": 100,
+      "failures": 0,
+      "checksum": 3051131460441299432,
+      "totalMeasuredWallNs": 80087809233,
+      "throughputItemsPerSecond": 86.1554344672581,
+      "amortizedWallNsPerItem": 11606928.874347826,
+      "requestLatency": {
+        "samples": 6900,
+        "meanNs": 11600304.20347826,
+        "minNs": 25927,
+        "p50Ns": 11682339,
+        "p95Ns": 12450369,
+        "p99Ns": 12807137,
+        "maxNs": 19492341
+      },
+      "roundWallTime": {
+        "samples": 10,
+        "meanNs": 8008780923.3,
+        "minNs": 7803437965,
+        "p50Ns": 8027758046,
+        "p95Ns": 8181647022,
+        "p99Ns": 8181647022,
+        "maxNs": 8181647022
+      }
+    },
+    "stream": {
+      "items": 6900,
+      "modelResults": 6800,
+      "ruleResults": 100,
+      "failures": 0,
+      "checksum": 3051131460441299432,
+      "totalMeasuredWallNs": 79622533392,
+      "throughputItemsPerSecond": 86.65888544427138,
+      "amortizedWallNsPerItem": 11539497.593043478,
+      "requestLatency": {
+        "samples": 6900,
+        "meanNs": 11531900.383768115,
+        "minNs": 18434,
+        "p50Ns": 11624280,
+        "p95Ns": 12321944,
+        "p99Ns": 12767257,
+        "maxNs": 18010306
+      },
+      "roundWallTime": {
+        "samples": 10,
+        "meanNs": 7962253339.2,
+        "minNs": 7809481030,
+        "p50Ns": 7968774347,
+        "p95Ns": 8104435049,
+        "p99Ns": 8104435049,
+        "maxNs": 8104435049
+      }
+    },
+    "batch": {
+      "items": 6900,
+      "modelResults": 6800,
+      "ruleResults": 100,
+      "failures": 0,
+      "checksum": 3051131535603227112,
+      "totalMeasuredWallNs": 98843684025,
+      "throughputItemsPerSecond": 69.80719170943507,
+      "amortizedBatchNsPerItem": 14325171.597826088,
+      "itemDeliveryLatency": {
+        "samples": 6900,
+        "meanNs": 452934736.03971016,
+        "minNs": 240605943,
+        "p50Ns": 456857656,
+        "p95Ns": 483732163,
+        "p99Ns": 498116391,
+        "maxNs": 507081531
+      },
+      "batchCallLatency": {
+        "samples": 10,
+        "meanNs": 9884368402.5,
+        "minNs": 9663628713,
+        "p50Ns": 9874070260,
+        "p95Ns": 10075683946,
+        "p99Ns": 10075683946,
+        "maxNs": 10075683946
+      }
+    },
+    "shared": {
+      "items": 6900,
+      "modelResults": 6800,
+      "ruleResults": 100,
+      "failures": 0,
+      "checksum": 3051131460441299432,
+      "totalMeasuredWallNs": 22085351943,
+      "throughputItemsPerSecond": 312.4242718797592,
+      "amortizedWallNsPerItem": 3200775.6439130437,
+      "requestLatency": {
+        "samples": 6900,
+        "meanNs": 12386178.338695653,
+        "minNs": 26720,
+        "p50Ns": 12287007,
+        "p95Ns": 13636404,
+        "p99Ns": 20625274,
+        "maxNs": 40744293
+      },
+      "roundWallTime": {
+        "samples": 10,
+        "meanNs": 2208535194.3,
+        "minNs": 2085711246,
+        "p50Ns": 2177752601,
+        "p95Ns": 2331586336,
+        "p99Ns": 2331586336,
+        "maxNs": 2331586336
+      }
+    }
+  }
+}

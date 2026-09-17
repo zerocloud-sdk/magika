@@ -1,0 +1,28 @@
+{
+  "items": 6900,
+  "modelResults": 6800,
+  "ruleResults": 100,
+  "failures": 0,
+  "checksum": 3051131535603227112,
+  "totalMeasuredWallNs": 98843684025,
+  "throughputItemsPerSecond": 69.80719170943507,
+  "amortizedBatchNsPerItem": 1.4325171597826088E7,
+  "itemDeliveryLatency": {
+    "samples": 6900,
+    "meanNs": 4.5293473603971016E8,
+    "minNs": 240605943,
+    "p50Ns": 456857656,
+    "p95Ns": 483732163,
+    "p99Ns": 498116391,
+    "maxNs": 507081531
+  },
+  "batchCallLatency": {
+    "samples": 10,
+    "meanNs": 9.8843684025E9,
+    "minNs": 9663628713,
+    "p50Ns": 9874070260,
+    "p95Ns": 10075683946,
+    "p99Ns": 10075683946,
+    "maxNs": 10075683946
+  }
+}
