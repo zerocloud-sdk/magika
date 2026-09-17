@@ -16,6 +16,11 @@ the version or commit generated build files. The current coordinate is
 The existing [verification workflow](../.github/workflows/verify.yml) is also the
 reusable release gate. Each Ubuntu 24.04 x64 / CPU job builds with JDK 21, targets
 Java 8, and executes the complete real-ORT regression suite on Java 8, 17 or 21.
+The release compiler is pinned to Temurin **21.0.12.1+1**: Javadoc output can
+change between JDK patch releases, so a floating compiler would break exact
+candidate reconstruction on a later retry. The action uses Adoptium's exact
+SemVer identifier `21.0.12+101.0.LTS` for that release. Runtime JVM versions are
+recorded for every matrix run.
 It retains XML reports, actual JVM/OS versions, build logs, the standalone
 offline-consumer log, and the four unsigned distribution files. No resource
 threshold, numerical tolerance or test is relaxed for release.
@@ -92,6 +97,11 @@ node scripts/release/candidate.mjs verify /tmp/magika-candidate
 bash scripts/consume-candidate.sh /tmp/magika-candidate \
   /usr/lib/jvm/java-8-openjdk-amd64 /tmp/magika-consumer-java-8
 ```
+
+For byte-identical reconstruction of CI artifacts, point `JAVA_HOME` at Temurin
+21.0.12.1+1. Other JDK 21 builds can generate different Javadoc bytes; the
+candidate verifier and retry logic deliberately reject changed distribution
+bytes instead of substituting them for the recorded candidate.
 
 Repeat the full `mvn verify` with Java 17/21 as `test.java.home`, preserving each
 runtime's XML and logs before the next run. Consume the **same** signed candidate
