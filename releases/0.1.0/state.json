@@ -69,8 +69,8 @@
     },
     "bundleSha256": "b1140610d9aaf56b07a5a84f346988e99f9fbe648256f6cfe91497cd177b2821"
   },
-  "phase": "publishing",
+  "phase": "complete",
   "deploymentId": "34e3277a-dd34-4e9c-8dd9-6bebc3932300",
   "deploymentName": "magika-0.1.0-c409ddf8fc8c3d53ce65ed73c2b06a18845f7366-b1140610d9aaf56b07a5a84f346988e99f9fbe648256f6cfe91497cd177b2821",
-  "centralState": "VALIDATED"
+  "centralState": "PUBLISHED"
 }
