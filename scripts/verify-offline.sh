@@ -5,10 +5,12 @@ set -euo pipefail
 repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 runtime_jdk=${1:?Usage: scripts/verify-offline.sh /absolute/path/to/runtime-jdk}
 runtime_jdk=$(readlink -f -- "$runtime_jdk")
-consumer_dir="$repo_dir/examples/offline/target"
+consumer_dir=${2:-"$repo_dir/examples/offline/target"}
+sdk_version=${3:-0.1.0}
 test -x "$runtime_jdk/bin/java"
 test -f "$consumer_dir/offline-byte-array-1.0.0.jar"
-test -f "$consumer_dir/dependency/magika-0.1.0.jar"
+test -f "$consumer_dir/dependency/magika-$sdk_version.jar"
+sdk_digest=$(sha256sum "$consumer_dir/dependency/magika-$sdk_version.jar" | cut -d ' ' -f 1)
 for required in rsync unzip ldd unshare chroot ip; do
   command -v "$required" >/dev/null
 done
@@ -47,5 +49,5 @@ echo "Offline packaged consumer: runtime=$runtime_jdk"
   ip link set lo up
   exec env -i PATH=/jdk/bin LANG=C \
     LD_LIBRARY_PATH=/jdk/lib:/jdk/lib/jli:/jdk/lib/amd64/jli:/jdk/jre/lib/amd64/jli:/jdk/lib/server:/jdk/jre/lib/amd64/server \
-    /usr/sbin/chroot "$1" /jdk/bin/java -Xmx128m -cp "/app/*" example.OfflineExample --check-isolated
-' bash "$isolation_root"
+    /usr/sbin/chroot "$1" /jdk/bin/java -Xmx128m -Dexpected.sdk.sha256="$2" -cp "/app/*" example.OfflineExample --check-isolated
+' bash "$isolation_root" "$sdk_digest"

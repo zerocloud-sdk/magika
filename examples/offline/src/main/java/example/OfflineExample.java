@@ -2,9 +2,13 @@
 package example;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.net.NetworkInterface;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.security.MessageDigest;
 import net.zerocloud.magika.DetectionResult;
 import net.zerocloud.magika.Magika;
 import net.zerocloud.magika.OverwriteReason;
@@ -13,6 +17,23 @@ import net.zerocloud.magika.PredictionMode;
 /** Standalone consumer: depends only on the installed SDK artifact. */
 public final class OfflineExample {
     public static void main(String[] args) throws Exception {
+        Path sdk = new File(Magika.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toPath();
+        if (!Files.isRegularFile(sdk) || !sdk.toString().endsWith(".jar")) {
+            throw new IllegalStateException("SDK must come from a dependency JAR: " + sdk);
+        }
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (InputStream input = Files.newInputStream(sdk)) {
+            byte[] buffer = new byte[8192];
+            int count;
+            while ((count = input.read(buffer)) != -1) { digest.update(buffer, 0, count); }
+        }
+        StringBuilder actual = new StringBuilder();
+        for (byte value : digest.digest()) { actual.append(String.format("%02x", value & 255)); }
+        String expected = System.getProperty("expected.sdk.sha256");
+        if (expected != null && !expected.equals(actual.toString())) {
+            throw new IllegalStateException("SDK differs from the verified candidate");
+        }
+        System.out.println("SDK origin=" + sdk + "; SHA-256=" + actual);
         if (args.length > 0 && "--check-isolated".equals(args[0])) {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces != null && interfaces.hasMoreElements()) {

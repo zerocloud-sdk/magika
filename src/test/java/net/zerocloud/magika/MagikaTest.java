@@ -46,7 +46,7 @@ public class MagikaTest {
         assertThrows(IllegalStateException.class, () -> magika.identify(PDF));
         assertEquals("pdf", result.getLabel());
         assertEquals("pdf", result.getRawPrediction().get().getLabel());
-        assertEquals("0.1.0", info.getSdkVersion());
+        assertEquals(System.getProperty("expected.sdk.version"), info.getSdkVersion());
         assertEquals("standard_v3_3", info.getModelVersion());
         assertEquals("9f225aa480e675af44343b9160f077073ed1b752", info.getUpstreamCommit());
         assertEquals(3, info.getAssetDigests().size());

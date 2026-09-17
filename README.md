@@ -15,6 +15,10 @@ identification with all three official prediction modes, defaulting to
 Version `0.1.0` here is a local build, not a claim
 that a release has been published to Maven Central.
 
+The [signed-candidate rehearsal and release guide](docs/releasing.md) documents
+the #9 distribution checks, isolated Maven consumption, gated workflow and
+deployment recovery. Formal publication remains the separate #10 acceptance.
+
 ## Build and use
 
 Build with JDK 21 and Maven 3.8.7 or later. Compilation uses `--release 8`, including
@@ -457,6 +461,12 @@ entry points and the same official score tolerance. Stream boundaries cover
 different chunk sizes, short reads, strict UTF-8 and long whitespace in all modes.
 Neither these cases nor the deterministic rule tests
 establish accuracy for all 214 model classes.
+
+The [supported final-label list](docs/supported-types.md) is derived from the
+authenticated model vocabulary, its type mapping, short-content rules and
+confidence fallbacks. It contains 214 possible final labels; the 353-entry
+knowledge base is not the support list. `randombytes` and `randomtxt` appear only
+as raw predictions, mapped to `unknown` and `txt` in every prediction mode.
 
 All 207 path references also run through `identifyAll` in the three modes, with
 exact labels/MIME/reasons and the same `1e-5` score tolerance. Mixed boundaries,
