@@ -1,7 +1,7 @@
 # Signed candidates and recoverable publication
 
-This is the #9 rehearsal path. Formal Maven Central publication and the versioned
-GitHub tag/Release are executed and accepted separately in
+This supports both the #9 rehearsal and the formal Maven Central publication,
+versioned GitHub tag/Release and Central consumption accepted in
 [#10](https://github.com/zerocloud-sdk/magika/issues/10). Rehearsal never uploads to
 Central and never creates a tag, Release, or release-ledger branch.
 
@@ -183,6 +183,40 @@ node scripts/release/supported-types.mjs --check
 
 The cryptographic test creates a disposable **test-only** key; release evidence
 must come from the configured release key, never this fixture.
+
+## Consume the published Central version
+
+Once the publish run reports `PUBLISHED` and creates the matching tag/Release,
+download its `signed-candidate` artifact and use a checkout of its exact source
+SHA. The candidate supplies authenticated expectations only. The following path
+does not install candidate files or use the SDK reactor:
+
+```sh
+# JAVA_HOME points to the pinned Temurin 21.0.12.1+1 compiler.
+export MAVEN_GPG_FINGERPRINT=C5149FD6B5EF7C2126F1FD0FCC1A12E348E171D8
+gh run download RUN_ID --repo zerocloud-sdk/magika \
+  -n signed-candidate -D /tmp/magika-published-candidate
+bash scripts/consume-central.sh /tmp/magika-published-candidate \
+  /usr/lib/jvm/java-8-openjdk-amd64 /tmp/magika-central-java-8
+```
+
+Choose a nonexistent work directory outside the SDK checkout for each runtime
+(Java 8, 17 and 21). The script copies the public API examples there and creates
+an empty Maven cache. Explicit global/user settings force all dependency and
+plugin downloads to `https://repo.maven.apache.org/maven2`. Maven transfer logs
+and `_remote.repositories` must prove the SDK POM and JAR came from that origin.
+All four published artifacts and their signatures are separately downloaded,
+saved under `central-files/`, and compared to the verified signed candidate;
+`central-downloads.json` records URLs, sizes and SHA-256 values.
+
+The first example run uses a Java-only chroot with networking unchanged. An
+offline Maven build then uses the same project/cache, and the examples run again
+in a new network namespace without external interfaces. Both runs check the
+actually loaded SDK JAR hash and perform real model inference. Preserve
+`maven-online.log`, `maven-offline.log`, `runtime.log`, `java-only-online.log`,
+`java-only-offline.log`, `central-downloads.json`, settings, example sources and
+the SDK cache-origin file. This is the formal consumption receipt; a successful
+`consume-candidate.sh` rehearsal alone is not Central consumption evidence.
 
 ## Official interfaces checked for this implementation
 

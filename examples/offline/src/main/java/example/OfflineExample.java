@@ -34,6 +34,12 @@ public final class OfflineExample {
             throw new IllegalStateException("SDK differs from the verified candidate");
         }
         System.out.println("SDK origin=" + sdk + "; SHA-256=" + actual);
+        if (args.length > 0 && ("--check-isolated".equals(args[0]) || "--check-java-only".equals(args[0]))) {
+            if (!"/jdk/bin".equals(System.getenv("PATH")) || new File("/usr/bin").exists()) {
+                throw new IllegalStateException("Expected isolated Java-only filesystem");
+            }
+            System.out.println("Isolation verified: Java-only root and PATH; no Python");
+        }
         if (args.length > 0 && "--check-isolated".equals(args[0])) {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces != null && interfaces.hasMoreElements()) {
@@ -41,9 +47,6 @@ public final class OfflineExample {
                 if (iface.isUp() && !iface.isLoopback()) {
                     throw new IllegalStateException("Network is available: " + iface.getName());
                 }
-            }
-            if (!"/jdk/bin".equals(System.getenv("PATH")) || new File("/usr/bin").exists()) {
-                throw new IllegalStateException("Expected isolated Java-only filesystem");
             }
             System.out.println("Isolation verified: no external network interface; Java-only root and PATH");
         }

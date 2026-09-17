@@ -7,6 +7,8 @@ runtime_jdk=${1:?Usage: scripts/verify-offline.sh /absolute/path/to/runtime-jdk}
 runtime_jdk=$(readlink -f -- "$runtime_jdk")
 consumer_dir=${2:-"$repo_dir/examples/offline/target"}
 sdk_version=${3:-0.1.0}
+network_mode=${4:-offline}
+case "$network_mode" in online|offline) ;; *) echo 'Expected online or offline network mode' >&2; exit 1 ;; esac
 test -x "$runtime_jdk/bin/java"
 test -f "$consumer_dir/offline-byte-array-1.0.0.jar"
 test -f "$consumer_dir/dependency/magika-$sdk_version.jar"
@@ -43,11 +45,19 @@ done < <(find "$isolation_root/jdk" "$isolation_dir/native" -type f \( -name '*.
 "${privilege[@]}" mknod -m 666 "$isolation_root/dev/null" c 1 3
 "${privilege[@]}" mknod -m 666 "$isolation_root/dev/random" c 1 8
 "${privilege[@]}" mknod -m 666 "$isolation_root/dev/urandom" c 1 9
-echo "Offline packaged consumer: runtime=$runtime_jdk"
-"${privilege[@]}" unshare --net -- bash -c '
+echo "Packaged Java-only consumer: runtime=$runtime_jdk; network=$network_mode"
+namespace=()
+if [[ "$network_mode" == offline ]]; then
+  namespace=(unshare --net --)
+fi
+"${privilege[@]}" "${namespace[@]}" bash -c '
   set -euo pipefail
-  ip link set lo up
+  check=--check-java-only
+  if [[ "$3" == offline ]]; then
+    ip link set lo up
+    check=--check-isolated
+  fi
   exec env -i PATH=/jdk/bin LANG=C \
     LD_LIBRARY_PATH=/jdk/lib:/jdk/lib/jli:/jdk/lib/amd64/jli:/jdk/jre/lib/amd64/jli:/jdk/lib/server:/jdk/jre/lib/amd64/server \
-    /usr/sbin/chroot "$1" /jdk/bin/java -Xmx128m -Dexpected.sdk.sha256="$2" -cp "/app/*" example.OfflineExample --check-isolated
-' bash "$isolation_root" "$sdk_digest"
+    /usr/sbin/chroot "$1" /jdk/bin/java -Xmx128m -Dexpected.sdk.sha256="$2" -cp "/app/*" example.OfflineExample "$check"
+' bash "$isolation_root" "$sdk_digest" "$network_mode"

@@ -13,6 +13,8 @@ function candidateFixture() {
   const values = names => Object.fromEntries(names.map(name => [name, { bytes: files[name].length, sha256: digest(files[name]) }]));
   const candidate = { schema: 1, version: '0.1.0', coordinate: 'net.zerocloud:magika:0.1.0', sourceSha: 'a'.repeat(40),
     model: 'standard_v3_3', contentSha256: 'b'.repeat(64), bundleSha256: digest(bundle), signingFingerprint: 'C'.repeat(40),
+    upstreamCommit: 'd'.repeat(40),
+    assets: [{ file: 'model.onnx', bytes: 123, sha256: 'e'.repeat(64), source: `https://example.org/${'d'.repeat(40)}/model.onnx` }],
     artifacts: values(artifactNames('0.1.0')), signatures: values(artifactNames('0.1.0').map(name => name + '.asc')) };
   return { candidate, files };
 }

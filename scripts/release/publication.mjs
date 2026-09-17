@@ -10,7 +10,25 @@ const sameRelease = (left, right) => {
   }
 };
 export function releaseBody(candidate) {
-  return `Maven: \`${candidate.coordinate}\`\nSource: \`${candidate.sourceSha}\`\nModel: \`${candidate.model}\`\n`
+  const source = `https://github.com/zerocloud-sdk/magika/blob/${candidate.sourceSha}`;
+  const assets = candidate.assets.map(asset => `| [${asset.file}](${asset.source}) | ${asset.bytes} | \`${asset.sha256}\` |`).join('\n');
+  return `Magika Java SDK **${candidate.version}**, independently maintained by ZeroCloud SDK.\n\n`
+    + `Maven: \`${candidate.coordinate}\`\nSource: \`${candidate.sourceSha}\`\nModel: \`${candidate.model}\`\n`
+    + `Fixed upstream: [google/magika at ${candidate.upstreamCommit}](https://github.com/google/magika/tree/${candidate.upstreamCommit}).\n\n`
+    + `The following Apache-2.0 model assets are bundled together; no runtime model download or Python is required.\n\n`
+    + `| Asset / fixed source | Bytes | SHA-256 |\n| --- | ---: | --- |\n${assets}\n\n`
+    + `Verified platform: Ubuntu 24.04 x64 / CPU, Java 8, 17 and 21, ONNX Runtime 1.30.0. `
+    + `Other platforms are not part of this release's verified support claim.\n\n`
+    + `Add the Maven dependency:\n\n\`\`\`xml\n<dependency>\n  <groupId>net.zerocloud</groupId>\n`
+    + `  <artifactId>magika</artifactId>\n  <version>${candidate.version}</version>\n</dependency>\n\`\`\`\n\n`
+    + `Identify a saved file through the public API:\n\n\`\`\`java\nimport java.nio.file.Paths;\n`
+    + `import net.zerocloud.magika.DetectionResult;\nimport net.zerocloud.magika.Magika;\n\n`
+    + `try (Magika magika = Magika.create()) {\n  DetectionResult result = magika.identify(Paths.get("upload.pdf"));\n`
+    + `  System.out.println(result.getLabel() + " " + result.getMimeType());\n}\n\`\`\`\n\n`
+    + `After Maven resolves the dependencies, identification works offline. `
+    + `See the [usage and lifecycle contracts](${source}/README.md), `
+    + `[standalone examples](https://github.com/zerocloud-sdk/magika/tree/${candidate.sourceSha}/examples/offline), `
+    + `and [performance report](${source}/docs/performance/issue-8-v1.md).\n\n`
     + `Candidate SHA-256: \`${candidate.contentSha256}\`\nBundle SHA-256: \`${candidate.bundleSha256}\`\n`
     + `Signing fingerprint: \`${candidate.signingFingerprint}\`\n\n`
     + `Published to Maven Central. Durable deployment record and signed bundle: `
