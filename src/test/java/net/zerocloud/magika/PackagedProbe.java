@@ -18,6 +18,9 @@ public final class PackagedProbe {
         check(Magika.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(".jar"),
                 "Probe must consume the packaged SDK, not target/classes");
         switch (args[0]) {
+            case "lifecycle-ort":
+                LifecycleOrtProbe.run();
+                break;
             case "batch-ort":
                 BatchOrtProbe.run();
                 break;

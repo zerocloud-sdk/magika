@@ -43,6 +43,7 @@ public final class OfflineExample {
         SavedUploadExample.main(new String[0]);
         StreamUploadExample.main(new String[0]);
         BatchExample.main(new String[0]);
+        SharedInstanceExample.main(new String[0]);
 
         byte[] ambiguousContent = {0, 1, 2, 3, 4, 5, 6, 7};
         for (PredictionMode mode : PredictionMode.values()) {

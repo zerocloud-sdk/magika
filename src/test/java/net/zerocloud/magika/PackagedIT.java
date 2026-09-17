@@ -180,6 +180,15 @@ public class PackagedIT {
 
     @Test
     public void realBatchShapesNativeFailuresAndResourceRelease() throws Exception {
+        ortProbe("batch-ort");
+    }
+
+    @Test
+    public void realSharedSessionAndNativeLifecycleFailures() throws Exception {
+        ortProbe("lifecycle-ort");
+    }
+
+    private void ortProbe(String mode) throws Exception {
         Path agent = temporary.newFile("ort-probe-agent.jar").toPath();
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().putValue("Manifest-Version", "1.0");
@@ -194,7 +203,7 @@ public class PackagedIT {
                 }
             }
         }
-        probe(sdkJar(), "128m", new String[] {"-javaagent:" + agent}, "batch-ort");
+        probe(sdkJar(), "128m", new String[] {"-javaagent:" + agent}, mode);
     }
 
     @Test
@@ -259,7 +268,7 @@ public class PackagedIT {
                 .split(File.pathSeparator)) {
             // The bytecode agent is used only by its own probe. Keep ASM off the
             // ordinary consumer classpath (including the native-loader fd baseline).
-            if (new File(dependency).getName().startsWith("asm-") && !args[0].equals("batch-ort")) { continue; }
+            if (new File(dependency).getName().startsWith("asm-") && !args[0].endsWith("-ort")) { continue; }
             if (dependency.endsWith(".jar") && !new File(dependency).getCanonicalFile().equals(sdkJar().toFile().getCanonicalFile())) {
                 classpath.append(File.pathSeparator).append(dependency);
             }

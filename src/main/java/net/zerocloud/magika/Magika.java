@@ -10,20 +10,29 @@ import java.util.function.Consumer;
  * Offline byte array, regular file, stream and lazy batch identification using the bundled standard_v3_3 model and
  * a configurable {@link PredictionMode}, defaulting to HIGH_CONFIDENCE.
  * Creating an instance eagerly validates assets and loads
- * a CPU ONNX Runtime session. Reuse instances for sequential calls.
+ * a CPU ONNX Runtime session. Reuse instances across concurrent calls.
  * Creation disables telemetry on the JVM-shared ORT environment, as upstream does.
  * After authentication, two model reductions use an equivalent axis layout to
  * keep single/multirow scores compatible; graph optimizations that undo this
  * layout are disabled. Weights and bundled asset digests are unchanged.
  *
- * <p>This version requires callers to serialize identification and closing;
- * shared concurrent use and close during identification are not supported yet.
+ * <p>Instances support concurrent identification. Closing stops admission and
+ * waits for every accepted synchronous call, including all batch callbacks,
+ * before releasing native resources. See {@link #close()} for blocking and
+ * reentrancy rules. Builders, caller-owned inputs and callbacks are not made
+ * thread-safe by sharing an instance.
  */
 public final class Magika implements AutoCloseable {
     private final ModelAdapter adapter;
     private final long maxStreamBytes;
     private final int batchSize;
-    private boolean closed;
+    private enum State { OPEN, CLOSING, CLOSED }
+    private final Object lifecycle = new Object();
+    private final ThreadLocal<Integer> callDepth = new ThreadLocal<>();
+    // Guarded by lifecycle. No input, callback or native operation runs under it.
+    private State state = State.OPEN;
+    private long activeCalls;
+    private Throwable closeFailure;
 
     private Magika(int intraOpThreads, PredictionMode predictionMode, long maxStreamBytes, int batchSize) {
         adapter = ModelAdapter.create(intraOpThreads, predictionMode);
@@ -53,17 +62,17 @@ public final class Magika implements AutoCloseable {
      * @param content complete file content, not just a prefix
      * @return an immutable result with no native resources to close
      * @throws IllegalArgumentException if content is null
-     * @throws IllegalStateException if this instance has been closed
+     * @throws IllegalStateException if this instance is closing or closed
      * @throws MagikaException if inference fails
      */
     public DetectionResult identify(byte[] content) {
         if (content == null) {
             throw new IllegalArgumentException("content must not be null");
         }
-        if (closed) {
-            throw new IllegalStateException("Magika is closed");
-        }
-        return adapter.identify(InputSample.fromBytes(content, ModelAssets.WINDOW_SIZE));
+        beginCall();
+        try {
+            return adapter.identify(InputSample.fromBytes(content, ModelAssets.WINDOW_SIZE));
+        } finally { endCall(); }
     }
 
     /**
@@ -79,7 +88,7 @@ public final class Magika implements AutoCloseable {
      * @param path the saved regular file to identify
      * @return an immutable result with no native resources to close
      * @throws IllegalArgumentException if path is null
-     * @throws IllegalStateException if this instance has been closed
+     * @throws IllegalStateException if this instance is closing or closed; the path is not accessed
      * @throws MagikaException if the input is not a readable regular file, sampling
      *         or closing its handle fails, or inference fails
      */
@@ -87,10 +96,10 @@ public final class Magika implements AutoCloseable {
         if (path == null) {
             throw new IllegalArgumentException("path must not be null");
         }
-        if (closed) {
-            throw new IllegalStateException("Magika is closed");
-        }
-        return adapter.identify(InputSample.fromPath(path, ModelAssets.WINDOW_SIZE));
+        beginCall();
+        try {
+            return adapter.identify(InputSample.fromPath(path, ModelAssets.WINDOW_SIZE));
+        } finally { endCall(); }
     }
 
     /**
@@ -111,7 +120,7 @@ public final class Magika implements AutoCloseable {
      * @param input the caller-owned stream, positioned at the start of the content
      * @return an immutable result with no native resources to close
      * @throws IllegalArgumentException if input is null
-     * @throws IllegalStateException if this instance has been closed; no bytes are read
+     * @throws IllegalStateException if this instance is closing or closed; no bytes are read
      * @throws MagikaException if reading fails, the stream exceeds the configured
      *         limit (both INPUT failures), or inference fails
      */
@@ -119,10 +128,10 @@ public final class Magika implements AutoCloseable {
         if (input == null) {
             throw new IllegalArgumentException("input must not be null");
         }
-        if (closed) {
-            throw new IllegalStateException("Magika is closed");
-        }
-        return adapter.identify(InputSample.fromStream(input, ModelAssets.WINDOW_SIZE, maxStreamBytes));
+        beginCall();
+        try {
+            return adapter.identify(InputSample.fromStream(input, ModelAssets.WINDOW_SIZE, maxStreamBytes));
+        } finally { endCall(); }
     }
 
     /**
@@ -144,21 +153,26 @@ public final class Magika implements AutoCloseable {
      * <p>Interruption is checked between inputs, before inference and callbacks,
      * and after each batch. The flag is preserved. Blocking input, user code and
      * native inference are not forcibly stopped. Keep paths/files stable while
-     * sampled, as for {@link #identify(Path)}. Serialize this entire call with
-     * other instance operations; callbacks must not close this instance.
+     * sampled, as for {@link #identify(Path)}. Once accepted, this entire call
+     * remains in flight until its remaining inputs and callbacks finish or the
+     * call aborts. Callbacks run without the lifecycle lock. They must not wait
+     * for another thread to close this instance; that would form a waiting cycle.
+     * Calling close on this thread during the call throws IllegalStateException.
      * @param paths non-null lazy input iterator; each element must be non-null
      * @param consumer non-null callback, invoked at most once per input position
      * @return counts of normally delivered successes and per-file failures
      * @throws IllegalArgumentException if either argument is null
-     * @throws IllegalStateException if this instance has been closed
+     * @throws IllegalStateException if this instance is closing or closed; the iterator is not consumed
      * @throws BatchIdentificationException if the call aborts
      */
     public BatchSummary identifyAll(Iterator<Path> paths, Consumer<BatchItemResult> consumer) {
         if (paths == null || consumer == null) {
             throw new IllegalArgumentException("paths and consumer must not be null");
         }
-        if (closed) { throw new IllegalStateException("Magika is closed"); }
-        return new BatchIdentification(adapter, batchSize).run(paths, consumer);
+        beginCall();
+        try {
+            return new BatchIdentification(adapter, batchSize).run(paths, consumer);
+        } finally { endCall(); }
     }
 
     /**
@@ -168,16 +182,90 @@ public final class Magika implements AutoCloseable {
     public ModelInfo getModelInfo() { return adapter.modelInfo(); }
 
     /**
-     * Closes the session, then its options. Repeated sequential calls are harmless.
-     * The JVM-shared ONNX Runtime environment is not closed. If native release
-     * fails, this instance remains closed and cannot be reused.
+     * Stops accepting identification calls, waits for accepted calls to exit,
+     * then closes the session followed by its options exactly once. Waiting
+     * includes all input reads, remaining batch inputs and callbacks. Concurrent
+     * and repeated closes wait for the same release to finish. The JVM-shared
+     * ONNX Runtime environment is not closed; immutable results and model
+     * information remain usable.
+     *
+     * <p>Waiting is uninterruptible; any observed interrupt is restored before
+     * this method exits. Close does not forcibly stop blocking input, user code
+     * or native inference, so it can wait indefinitely. Input timeouts and
+     * callback completion are the caller's responsibility. User code inside an
+     * accepted call must not wait for another thread to close this instance.
+     * A same-thread close inside such a call is rejected without changing state.
+     *
+     * <p>If release fails, cleanup of other owned resources is still attempted.
+     * The instance stays closed, waiting closers are released, and subsequent
+     * close calls also report the failure without retrying native release.
+     * @throws IllegalStateException if this thread is inside an accepted call on this instance
      * @throws MagikaException if releasing owned resources fails
      */
     @Override
     public void close() {
-        if (!closed) {
-            closed = true;
-            adapter.close();
+        if (callDepth.get() != null) {
+            throw new IllegalStateException("Cannot close Magika from an active identification call");
+        }
+        boolean interrupted = false;
+        try {
+            synchronized (lifecycle) {
+                while (state == State.CLOSING) {
+                    try { lifecycle.wait(); }
+                    catch (InterruptedException ignored) { interrupted = true; }
+                }
+                if (state == State.CLOSED) {
+                    reportCloseFailure(false);
+                    return;
+                }
+                state = State.CLOSING;
+                while (activeCalls != 0) {
+                    try { lifecycle.wait(); }
+                    catch (InterruptedException ignored) { interrupted = true; }
+                }
+            }
+            try {
+                adapter.close();
+            } catch (RuntimeException | Error failure) {
+                synchronized (lifecycle) { closeFailure = failure; }
+            } finally {
+                synchronized (lifecycle) {
+                    state = State.CLOSED;
+                    lifecycle.notifyAll();
+                }
+            }
+            synchronized (lifecycle) { reportCloseFailure(true); }
+        } finally {
+            if (interrupted) { Thread.currentThread().interrupt(); }
+        }
+    }
+
+    private void beginCall() {
+        synchronized (lifecycle) {
+            if (state != State.OPEN) { throw new IllegalStateException("Magika is closing or closed"); }
+            Integer depth = callDepth.get();
+            callDepth.set(depth == null ? 1 : depth + 1);
+            activeCalls++;
+        }
+    }
+
+    private void endCall() {
+        synchronized (lifecycle) {
+            int depth = callDepth.get();
+            if (depth == 1) { callDepth.remove(); } else { callDepth.set(depth - 1); }
+            activeCalls--;
+            if (activeCalls == 0) { lifecycle.notifyAll(); }
+        }
+    }
+
+    private void reportCloseFailure(boolean releasingThread) {
+        if (releasingThread && closeFailure instanceof Error) { throw (Error) closeFailure; }
+        if (closeFailure != null) {
+            // Preserve the initiating Error, but never rethrow the same object
+            // from a later close (including an automatic try-with-resources close).
+            Throwable cause = closeFailure instanceof MagikaException ? closeFailure.getCause() : closeFailure;
+            throw new MagikaException(MagikaException.Category.RESOURCE_RELEASE,
+                    ModelAssets.MODEL_VERSION, "Cannot release native instance resources", cause);
         }
     }
 

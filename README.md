@@ -7,11 +7,12 @@ official ONNX Runtime CPU dependency, version `1.30.0`.
 This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2),
 [issue #3](https://github.com/zerocloud-sdk/magika/issues/3),
 [issue #4](https://github.com/zerocloud-sdk/magika/issues/4),
-[issue #5](https://github.com/zerocloud-sdk/magika/issues/5) and
-[issue #6](https://github.com/zerocloud-sdk/magika/issues/6): sequential byte array, file, stream and batch
+[issue #5](https://github.com/zerocloud-sdk/magika/issues/5),
+[issue #6](https://github.com/zerocloud-sdk/magika/issues/6) and
+[issue #7](https://github.com/zerocloud-sdk/magika/issues/7): concurrent byte array, file, stream and batch
 identification with all three official prediction modes, defaulting to
-**HIGH_CONFIDENCE**. Concurrent use and release
-publication are separate tickets. Version `0.1.0` here is a local build, not a claim
+**HIGH_CONFIDENCE**. Release publication is a separate ticket.
+Version `0.1.0` here is a local build, not a claim
 that a release has been published to Maven Central.
 
 ## Build and use
@@ -59,11 +60,44 @@ real session before returning. They do not download anything.
 Like the fixed upstream implementation, creation disables telemetry on the
 JVM-shared ORT environment; this setting also affects other users of that environment.
 
-Reuse an instance for sequential calls. The caller must serialize calls to
-`identify`, the entire `identifyAll` call and `close` in this version. Close the instance with try-with-resources;
-closing releases the Session before SessionOptions and leaves the JVM-shared
-OrtEnvironment alone. Repeated sequential close is harmless. Identification after
-close throws `IllegalStateException`. `getModelInfo()` remains usable after close.
+Reuse one instance across requests and threads. All `identify` overloads and
+`identifyAll` share its real ORT Session, with separate sampling, tensors and
+results for each call. The application owns request scheduling; the SDK creates
+no worker pool. Builders are not thread-safe. Keep each input stable and
+coordinate any input or callback state shared by the application.
+
+## Shared lifetime and shutdown
+
+The lifecycle is **OPEN → CLOSING → CLOSED**. `close()` stops admission before
+waiting. New identification calls throw `IllegalStateException` without reading
+their input or consuming their iterator. An accepted call keeps running until it
+returns or fails under its normal contract. An accepted batch includes **all
+remaining inputs and callbacks**, not just its current inference batch.
+
+Once all calls exit, close releases the Session, then SessionOptions, exactly
+once. It leaves the JVM-shared OrtEnvironment available to other instances.
+Repeated and concurrent closes wait for the same release to finish. If a closer
+is interrupted while waiting, it still finishes waiting and restores its interrupt
+flag before exit. Release failures are reported, other owned resources still get
+a cleanup attempt, and the instance stays closed. Later closes report the same
+underlying failure without retrying release. Immutable results and
+`getModelInfo()` remain usable after close.
+
+Close has no timeout and does not forcibly terminate blocking input, a user
+callback, or native inference. Configure timeouts at the input source and arrange
+for callbacks to finish. **Same-thread close from an active call** (including
+stream/file reads, iterator code and callbacks) immediately throws
+`IllegalStateException` without changing the lifecycle. Callbacks execute without
+the lifecycle lock, but must not wait for another thread to close this instance:
+close is waiting for the callback, forming a caller-created waiting cycle.
+
+The [runnable shared-instance example](examples/offline/src/main/java/example/SharedInstanceExample.java)
+creates one instance, serves 16 requests on four application workers, then shuts
+down and reads a retained result. In a service, create the instance at startup,
+stop accepting application requests at shutdown, finish queued requests, and close
+the instance. A task queued on an application executor has **not** yet been
+accepted by the SDK; admission occurs when it enters an identification method.
+The standalone and isolated consumers below also run this example.
 
 ## Saved uploads and regular files
 
@@ -223,9 +257,9 @@ the application may instead filter them when planning its input sequence.
 - Interrupts are observed between inputs, before inference/delivery and after a
   batch, with the interrupt flag preserved and progress recorded. This cannot
   immediately stop blocking input, user code or an entered native operation.
-  Callbacks execute without a lifecycle lock. Serialize the entire call with
-  other operations on this instance; callbacks must not close it. Concurrent
-  lifecycle coordination belongs to issue #7.
+  Callbacks execute without a lifecycle lock and may identify other inputs while
+  the instance is open. Closing rejects nested new calls too. Callbacks must not
+  close the same instance or wait for another thread to close it.
 
 The pinned upstream asset bytes and their published digests remain unchanged.
 After authentication the runtime applies an equivalent layout transformation to
@@ -321,7 +355,7 @@ strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
 | Failure | Public exception |
 | --- | --- |
 | Null input/callback/mode, invalid batch size, nonpositive thread count or negative stream limit | `IllegalArgumentException` |
-| Identification after close | `IllegalStateException` |
+| Identification during/after close; same-thread close inside an accepted call | `IllegalStateException` |
 | Missing, corrupt or inconsistent assets | `MagikaException`, category `ASSET_VALIDATION` |
 | Native loading, Session initialization or signature failure | `MagikaException`, category `MODEL_INITIALIZATION` |
 | Non-regular, missing or unreadable file; sampling or file-handle close failure | `MagikaException`, category `INPUT` |
@@ -432,6 +466,13 @@ real ORT tensor shapes, native failures and resource closure through ORT's publi
 boundary, and process 1,000,003 lazy input positions in a separate 64 MiB JVM.
 The ORT probe agent and ASM are test-only; they are absent from SDK runtime dependencies.
 
+Shared-instance tests compare every result field across four concurrent entry
+points in all modes, preserving exact single-entry comparisons and the batch
+score tolerance. Controlled reads, iterators, callbacks and public ORT boundaries
+verify full-call draining, untouched rejection, reentrancy, interrupted and
+concurrent closers, per-call tensor/result ownership, initialization cleanup and
+release failures. See the [concurrency verification record](docs/verification-issue-7.md).
+
 Before upgrading the model or its companion configuration/metadata, pin the new
 asset set and upstream reference sources together, then rerun compatibility
 acceptance:
@@ -446,6 +487,8 @@ acceptance:
   position, caller ownership, read failures, size limits and the heap-limited generated stream.
 - Batch reference parity, lazy ordered delivery, file errors, abort/interruption
   progress, native tensor/resource checks and the million-path limited-heap probe.
+- Shared Session concurrent inference, full-call close draining, reentrant close,
+  interrupted/concurrent closers, release failure convergence and resource isolation.
 - HIGH/MEDIUM below/equal/above threshold cases, per-label threshold defaults,
   mapping, text/binary fallback, unchanged-label reasons and BEST_GUESS low scores.
 - Rule short circuits for empty/short content in every mode: absent raw

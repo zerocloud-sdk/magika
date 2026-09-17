@@ -23,7 +23,7 @@ public final class SavedUploadExample {
                 Files.copy(upload, saved, StandardCopyOption.REPLACE_EXISTING);
             }
             DetectionResult result;
-            // A server should reuse a long-lived instance for sequential requests in this version.
+            // A server should reuse one long-lived instance across concurrent requests.
             try (Magika sdk = Magika.create()) {
                 result = sdk.identify(saved);
             }
