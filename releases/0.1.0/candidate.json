@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "coordinate": "net.zerocloud:magika:0.1.0",
+  "version": "0.1.0",
+  "sourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+  "artifacts": {
+    "magika-0.1.0-javadoc.jar": {
+      "bytes": 172460,
+      "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+    },
+    "magika-0.1.0-sources.jar": {
+      "bytes": 45033,
+      "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+    },
+    "magika-0.1.0.jar": {
+      "bytes": 2978079,
+      "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+    },
+    "magika-0.1.0.pom": {
+      "bytes": 7063,
+      "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+    }
+  },
+  "model": "standard_v3_3",
+  "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+  "assets": [
+    {
+      "file": "model.onnx",
+      "bytes": 3163737,
+      "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/model.onnx"
+    },
+    {
+      "file": "config.min.json",
+      "bytes": 2141,
+      "sha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/config.min.json"
+    },
+    {
+      "file": "content_types_kb.min.json",
+      "bytes": 44768,
+      "sha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/content_types_kb.min.json"
+    }
+  ],
+  "javaClassVersion": 52,
+  "classes": 27,
+  "contentSha256": "ba0b335229004f31c9ad6c9e3e68efdcf9f5e638fc6d51085ade8819a6d1a297",
+  "signingFingerprint": "C5149FD6B5EF7C2126F1FD0FCC1A12E348E171D8",
+  "signatures": {
+    "magika-0.1.0-javadoc.jar.asc": {
+      "bytes": 833,
+      "sha256": "068e5852a249f95361f37dce01416f09754f1917d880ac0a7eeec888c81313c4"
+    },
+    "magika-0.1.0-sources.jar.asc": {
+      "bytes": 833,
+      "sha256": "a90dff15951b2c0da3f2677be68d419b3a1fd35afe67b3e8f2847c7ffa537bf3"
+    },
+    "magika-0.1.0.jar.asc": {
+      "bytes": 833,
+      "sha256": "14952dbcbd88e758e9cc6e808f84519094b66a0ba2ddea682959e8d45d78ab62"
+    },
+    "magika-0.1.0.pom.asc": {
+      "bytes": 833,
+      "sha256": "deafdeb8d0621fe9da60e6cbc7742f46dc8861b12a4cd31179c28e58f01fdb97"
+    }
+  },
+  "bundleSha256": "b1140610d9aaf56b07a5a84f346988e99f9fbe648256f6cfe91497cd177b2821"
+}
