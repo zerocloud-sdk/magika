@@ -1,0 +1,16 @@
+Magika Java SDK
+Copyright 2026 ZeroCloud SDK contributors
+
+This product includes model assets and reference data from Google Magika:
+https://github.com/google/magika
+Copyright 2024 Google LLC
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+Upstream commit: 9f225aa480e675af44343b9160f077073ed1b752
+
+The feature extraction and prediction rules are Java adaptations of the
+Python implementation at that commit. Model assets are redistributed unmodified.
+Reference data is used for tests only and is not included in the SDK JAR.
+
+This is an independently maintained SDK by ZeroCloud SDK, not a Google product.
+ONNX Runtime and Gson are separate, unmodified Maven dependencies and retain
+their own licenses and notices.

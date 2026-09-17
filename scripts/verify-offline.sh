@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Copyright 2026 ZeroCloud SDK contributors. SPDX-License-Identifier: Apache-2.0
+# Ubuntu 24.04 x64 acceptance: a fresh network namespace and a Java-only chroot.
+set -euo pipefail
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+runtime_jdk=${1:?Usage: scripts/verify-offline.sh /absolute/path/to/runtime-jdk}
+runtime_jdk=$(readlink -f -- "$runtime_jdk")
+consumer_dir="$repo_dir/examples/offline/target"
+test -x "$runtime_jdk/bin/java"
+test -f "$consumer_dir/offline-byte-array-1.0.0.jar"
+test -f "$consumer_dir/dependency/magika-0.1.0.jar"
+for required in rsync unzip ldd unshare chroot ip; do
+  command -v "$required" >/dev/null
+done
+privilege=()
+if [[ $(id -u) != 0 ]]; then
+  privilege=(sudo -n)
+fi
+isolation_dir=$(mktemp -d "${TMPDIR:-/tmp}/magika-offline.XXXXXXXX")
+cleanup() { "${privilege[@]}" rm -rf -- "$isolation_dir"; }
+trap cleanup EXIT
+isolation_root="$isolation_dir/root"
+mkdir -p "$isolation_root"/{jdk/bin,app,dev,tmp} "$isolation_dir/native"
+chmod 1777 "$isolation_root/tmp"
+cp -L -- "$runtime_jdk/bin/java" "$isolation_root/jdk/bin/java"
+# A Java runtime filesystem: no Maven, Python, shell, or host filesystem bind.
+for directory in lib jre conf; do
+  if [[ -d "$runtime_jdk/$directory" ]]; then
+    rsync -rL --exclude=src.zip --exclude=*.jmod -- "$runtime_jdk/$directory" "$isolation_root/jdk/"
+  fi
+done
+cp -- "$consumer_dir/offline-byte-array-1.0.0.jar" "$consumer_dir"/dependency/*.jar "$isolation_root/app/"
+unzip -q "$consumer_dir/dependency/onnxruntime-1.30.0.jar" 'ai/onnxruntime/native/linux-x64/*' -d "$isolation_dir/native"
+# Include dynamic loader and native dependencies, at their absolute loader paths.
+while IFS= read -r -d '' binary; do
+  while IFS= read -r library; do
+    [[ "$library" == "$isolation_dir/"* ]] && continue
+    cp -L --parents -- "$library" "$isolation_root"
+  done < <(ldd "$binary" 2>/dev/null | awk '$1 ~ /^\// {print $1} $2 == "=>" && $3 ~ /^\// {print $3}')
+done < <(find "$isolation_root/jdk" "$isolation_dir/native" -type f \( -name '*.so' -o -name '*.so.*' -o -name java \) -print0)
+"${privilege[@]}" mknod -m 666 "$isolation_root/dev/null" c 1 3
+"${privilege[@]}" mknod -m 666 "$isolation_root/dev/random" c 1 8
+"${privilege[@]}" mknod -m 666 "$isolation_root/dev/urandom" c 1 9
+echo "Offline packaged consumer: runtime=$runtime_jdk"
+"${privilege[@]}" unshare --net -- bash -c '
+  set -euo pipefail
+  ip link set lo up
+  exec env -i PATH=/jdk/bin LANG=C \
+    LD_LIBRARY_PATH=/jdk/lib:/jdk/lib/jli:/jdk/lib/amd64/jli:/jdk/jre/lib/amd64/jli:/jdk/lib/server:/jdk/jre/lib/amd64/server \
+    /usr/sbin/chroot "$1" /jdk/bin/java -Xmx128m -cp "/app/*" example.OfflineExample --check-isolated
+' bash "$isolation_root"

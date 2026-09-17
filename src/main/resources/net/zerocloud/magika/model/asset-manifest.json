@@ -1,0 +1,87 @@
+{
+  "upstreamRepository": "https://github.com/google/magika",
+  "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+  "modelVersion": "standard_v3_3",
+  "license": "Apache-2.0",
+  "copyright": "Copyright 2024 Google LLC",
+  "licenseSource": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/LICENSE",
+  "modelContract": {
+    "input": {
+      "name": "bytes",
+      "type": "INT32",
+      "shape": [
+        "batch",
+        2048
+      ]
+    },
+    "output": {
+      "name": "target_label",
+      "type": "FLOAT",
+      "shape": [
+        "batch",
+        214
+      ]
+    },
+    "head": 1024,
+    "tail": 1024,
+    "window": 4096,
+    "padding": 256,
+    "minModelBytes": 8,
+    "orderedLabelsSha256": "afeb4026b9463bb6103adbf8d276766cab7c8396e78d851b7f3481cf4de07e77",
+    "orderedLabelsEncoding": "UTF-8 labels joined by LF, no trailing LF"
+  },
+  "assets": [
+    {
+      "file": "model.onnx",
+      "bytes": 3163737,
+      "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/model.onnx"
+    },
+    {
+      "file": "config.min.json",
+      "bytes": 2141,
+      "sha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/config.min.json"
+    },
+    {
+      "file": "content_types_kb.min.json",
+      "bytes": 44768,
+      "sha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/content_types_kb.min.json"
+    }
+  ],
+  "referenceData": [
+    {
+      "file": "features_extraction_examples.json.gz",
+      "bytes": 247051,
+      "sha256": "f8c78b07f3070089799f97d530658744604970688a15e25479cf9c3afbe49e41",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/tests_data/reference/features_extraction_examples.json.gz",
+      "cases": 9261,
+      "parameters": {
+        "head": 128,
+        "tail": 64,
+        "window": 512,
+        "padding": 256
+      },
+      "inputs": "Complete original contents embedded as base64; no separate source files required"
+    },
+    {
+      "file": "standard_v3_3-inference_examples_by_content.json.gz",
+      "bytes": 20865,
+      "sha256": "3eda361e3d7290457bc859c02d491a5d94fcda3df75f1c53147adda57c0f756f",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/tests_data/reference/standard_v3_3-inference_examples_by_content.json.gz",
+      "casesInFile": 141,
+      "casesInScope": 47,
+      "modeInScope": "high_confidence",
+      "inputs": "Complete original contents embedded as base64; no separate source files required"
+    }
+  ],
+  "referenceImplementation": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/python/src/magika/magika.py",
+  "testGenerators": [
+    "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/python/tests/test_features_extraction_vs_reference.py",
+    "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/python/tests/test_inference_vs_reference.py"
+  ],
+  "verificationTools": {
+    "python": "Not used or required; Java tests consume the original static gzip files"
+  }
+}

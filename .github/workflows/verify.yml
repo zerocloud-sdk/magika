@@ -1,0 +1,50 @@
+name: Verify offline byte-array SDK
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: ['8', '17', '21']
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install build JDK 21
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Save compiler path
+        run: echo "BUILD_JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - name: Install test JVM
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.runtime }}
+      - name: Build with 21; verify and install using selected test JVM
+        shell: bash
+        run: |
+          runtime_jdk="$JAVA_HOME"
+          echo "RUNTIME_JDK=$runtime_jdk" >> "$GITHUB_ENV"
+          "$BUILD_JAVA_HOME/bin/java" -version
+          "$runtime_jdk/bin/java" -version
+          cat /etc/os-release
+          uname -m
+          export JAVA_HOME="$BUILD_JAVA_HOME"
+          mvn -B -ntp -Dtest.java.home="$runtime_jdk" clean install
+          mvn -B -ntp -f examples/offline/pom.xml clean package
+      - name: Consume packaged SDK with no network or Python
+        run: bash scripts/verify-offline.sh "$RUNTIME_JDK"
+      - name: Preserve actual JVM and verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verification-java-${{ matrix.runtime }}
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
