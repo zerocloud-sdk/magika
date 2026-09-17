@@ -1,14 +1,15 @@
 # Magika Java SDK
 
 An independently maintained Java 8 SDK by ZeroCloud SDK. It identifies complete
-byte arrays and saved regular files offline using Google's bundled `standard_v3_3` Magika model and the
+byte arrays, saved regular files and streams offline using Google's bundled `standard_v3_3` Magika model and the
 official ONNX Runtime CPU dependency, version `1.30.0`.
 
 This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2),
-[issue #3](https://github.com/zerocloud-sdk/magika/issues/3) and
-[issue #4](https://github.com/zerocloud-sdk/magika/issues/4): sequential byte array and file
+[issue #3](https://github.com/zerocloud-sdk/magika/issues/3),
+[issue #4](https://github.com/zerocloud-sdk/magika/issues/4) and
+[issue #5](https://github.com/zerocloud-sdk/magika/issues/5): sequential byte array, file and stream
 identification with all three official prediction modes, defaulting to
-**HIGH_CONFIDENCE**. Stream/batch APIs, concurrent use and release
+**HIGH_CONFIDENCE**. Batch APIs, concurrent use and release
 publication are separate tickets. Version `0.1.0` here is a local build, not a claim
 that a release has been published to Maven Central.
 
@@ -102,6 +103,54 @@ snapshot and cannot detect every concurrent modification. Observable truncation,
 read failures or size changes during sampling report input errors without retrying.
 Same-content files and complete byte arrays use the same rules in all three modes.
 
+## Upload streams
+
+Pass a caller-owned `InputStream` directly to `identify`. Identification consumes
+all remaining bytes **from the current position to EOF**, using the same rules
+and returning the same result fields as a complete `byte[]` in all three modes.
+
+```java
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import net.zerocloud.magika.DetectionResult;
+import net.zerocloud.magika.Magika;
+
+// An HTTP request body can also be supplied directly as upload.
+try (InputStream upload = Files.newInputStream(Paths.get("uploads", "completed-upload.bin"));
+     Magika magika = Magika.builder().maxStreamBytes(128L * 1024 * 1024).build()) {
+    DetectionResult result = magika.identify(upload);
+    System.out.println(result.getLabel() + " " + result.getMimeType());
+} // The application closes its stream here.
+```
+
+The default stream limit is **67,108,864 bytes (64 MiB)**. Configure a nonnegative
+`long` with `maxStreamBytes`; negative values throw `IllegalArgumentException`,
+and zero accepts only an empty remaining stream. `Long.MAX_VALUE` is supported.
+Each built instance keeps its limit even if the builder is later changed.
+The limit applies only to streams, independently of byte array and Path inputs.
+
+At most **one extra byte** is consumed to distinguish a stream exactly at the
+limit from one that exceeds it. An oversized stream immediately throws
+`MagikaException` with category `INPUT` and `maxStreamBytes` in its context;
+the SDK stops reading and never identifies a truncated prefix. Read failures
+also throw `INPUT` and preserve the original cause. Empty content and unknown
+types remain successful results. A null stream throws `IllegalArgumentException`;
+a closed SDK rejects stream identification before any read.
+
+The SDK **never closes or resets** the caller's stream, including on failure.
+The caller arranges any later replay, saving or reopening. Configure blocking
+read timeouts on the input source (for example, the HTTP connection); the SDK
+does not impose a timeout. Sampling uses head and tail windows of at most
+4096 bytes each, one fixed 4096-byte work buffer and a `long` total length.
+It never saves the complete stream in memory or a temporary file. This sampling
+memory guarantee excludes the model, ORT, caller-owned buffers and retained results.
+
+The [runnable stream-upload example](examples/offline/src/main/java/example/StreamUploadExample.java)
+consumes an application envelope first, identifies the remaining upload, and
+closes the stream in the application's resource block. The isolated consumer
+below compiles and runs it against the installed SDK.
+
 ## Prediction modes
 
 Select a mode with `Magika.builder().predictionMode(PredictionMode.MEDIUM_CONFIDENCE).build()`.
@@ -185,11 +234,12 @@ strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
 
 | Failure | Public exception |
 | --- | --- |
-| Null input, null prediction mode or nonpositive thread count | `IllegalArgumentException` |
+| Null input, null prediction mode, nonpositive thread count or negative stream limit | `IllegalArgumentException` |
 | Identification after close | `IllegalStateException` |
 | Missing, corrupt or inconsistent assets | `MagikaException`, category `ASSET_VALIDATION` |
 | Native loading, Session initialization or signature failure | `MagikaException`, category `MODEL_INITIALIZATION` |
 | Non-regular, missing or unreadable file; sampling or file-handle close failure | `MagikaException`, category `INPUT` |
+| Stream read failure or configured stream limit exceeded | `MagikaException`, category `INPUT` |
 | Inference/output failure | `MagikaException`, category `INFERENCE` |
 | Instance resource-release failure | `MagikaException`, category `RESOURCE_RELEASE` |
 
@@ -236,8 +286,9 @@ loading errors retain their cause in `MagikaException`.
 `mvn verify` is the acceptance entry point: Java tests read the original static
 gzip fixtures, exercise real ORT, validate packaged resources and bytecode, reject
 altered assets, and run separate JVM probes for bounded input copying, native
-thread configuration, sequential native resource reuse, a file larger than the
-heap, input errors and owned file handles. Special-file probes have a process timeout;
+thread configuration, sequential native resource reuse, a file and a generated stream
+larger than the heap and the `int` range, input errors and owned file handles.
+Stream and special-file probes have a process timeout;
 permission checks require a real denied open by an unprivileged test user.
 Javadoc generation
 also runs and rejects documentation warnings. No Python generation step is used.
@@ -258,7 +309,8 @@ done
 The test logs print the actual runtime version, vendor, home, OS/architecture and
 native ORT version. [CI](.github/workflows/verify.yml) uses Ubuntu 24.04 x64, JDK 21
 for compilation, separate Java 8/17/21 test JVMs, and the isolated packaged consumer.
-The [regular-file verification record](docs/verification-issue-4.md),
+The [stream verification record](docs/verification-issue-5.md),
+[regular-file verification record](docs/verification-issue-4.md),
 [prediction-mode verification record](docs/verification-issue-3.md) and
 [initial SDK verification record](docs/verification-issue-2.md) record executed checks and
 limits. Platform evidence is limited to Ubuntu 24.04 x64 / CPU; other distributions,
@@ -278,6 +330,10 @@ overwrite reasons and MIME strings, and absolute score error at most `1e-5`.
 All 207 path cases are checked through public `identify(Path)`, exactly 69 per mode,
 against both the fixed reference and complete `byte[]` results. Boundary cases
 also compare their exact features through the restricted feature contract.
+All 141 content references and the contents of all 207 path references also run
+through public `identify(InputStream)`, with exact result equality to the other
+entry points and the same official score tolerance. Stream boundaries cover
+different chunk sizes, short reads, strict UTF-8 and long whitespace in all modes.
 Neither these cases nor the deterministic rule tests
 establish accuracy for all 214 model classes.
 
@@ -291,6 +347,8 @@ acceptance:
   checking raw/final labels, reasons, MIME and the `1e-5` score tolerance.
 - All 207 path references and 69 authenticated original files, plus Path/byte[]
   feature and result equality, file errors, single-handle ownership and bounded sampling.
+- Stream equivalence for those content/path references and boundary cases, current
+  position, caller ownership, read failures, size limits and the heap-limited generated stream.
 - HIGH/MEDIUM below/equal/above threshold cases, per-label threshold defaults,
   mapping, text/binary fallback, unchanged-label reasons and BEST_GUESS low scores.
 - Rule short circuits for empty/short content in every mode: absent raw

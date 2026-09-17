@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,6 +57,13 @@ public class PathReferenceTest {
                     maxError = Math.max(maxError,
                             Fixtures.assertReference(message, example.getAsJsonObject("prediction"), kb, actual));
                     Fixtures.assertEquivalent(message, sdk.identify(Files.readAllBytes(path)), actual);
+                    try (InputStream input = Files.newInputStream(path)) {
+                        DetectionResult streamed = sdk.identify(input);
+                        maxError = Math.max(maxError, Fixtures.assertReference(message + " stream",
+                                example.getAsJsonObject("prediction"), kb, streamed));
+                        Fixtures.assertEquivalent(message + " stream/Path/byte[]", actual, streamed);
+                        assertEquals(message + " consumed to EOF", -1, input.read());
+                    }
                     if (actual.isModelUsed()) { modelUses++; }
                     count++;
                 }
@@ -66,7 +74,7 @@ public class PathReferenceTest {
             System.out.println(mode + " path references: " + seen.size() + ", modelUsed=" + modelUses);
         }
         assertEquals(207, count);
-        System.out.println("All path references: " + count + ", max absolute score error=" + maxError);
+        System.out.println("All path references (Path, byte[] and stream): " + count + ", max absolute score error=" + maxError);
     }
 
     private static Set<String> authenticateOriginalFiles() throws Exception {

@@ -1,10 +1,11 @@
 /* Copyright 2026 ZeroCloud SDK contributors. SPDX-License-Identifier: Apache-2.0 */
 package net.zerocloud.magika;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 
 /**
- * Offline byte array and regular file identification using the bundled standard_v3_3 model and
+ * Offline byte array, regular file and stream identification using the bundled standard_v3_3 model and
  * a configurable {@link PredictionMode}, defaulting to HIGH_CONFIDENCE.
  * Creating an instance eagerly validates assets and loads
  * a CPU ONNX Runtime session. Reuse instances for sequential calls.
@@ -15,15 +16,17 @@ import java.nio.file.Path;
  */
 public final class Magika implements AutoCloseable {
     private final ModelAdapter adapter;
+    private final long maxStreamBytes;
     private boolean closed;
 
-    private Magika(int intraOpThreads, PredictionMode predictionMode) {
+    private Magika(int intraOpThreads, PredictionMode predictionMode, long maxStreamBytes) {
         adapter = ModelAdapter.create(intraOpThreads, predictionMode);
+        this.maxStreamBytes = maxStreamBytes;
     }
 
     /**
      * Creates an instance with HIGH_CONFIDENCE rules, sequential graph execution,
-     * and one intra-operation thread.
+     * one intra-operation thread, and a 67,108,864-byte (64 MiB) stream limit.
      * @return a fully initialized instance
      * @throws MagikaException if asset validation or initialization fails
      */
@@ -83,6 +86,38 @@ public final class Magika implements AutoCloseable {
     }
 
     /**
+     * Identifies all remaining content from the stream's current position to EOF.
+     * The SDK never closes or resets the stream, on success or failure. Arrange
+     * any replay or reopening in the calling application; blocking read timeouts
+     * are controlled by the input source.
+     *
+     * <p>The configured {@link Builder#maxStreamBytes(long)} limit defaults to
+     * 67,108,864 bytes (64 MiB). At most one extra byte is consumed to detect
+     * overflow; exceeding the limit fails immediately without identifying a
+     * truncated input. A zero limit accepts only an empty remaining stream.
+     *
+     * <p>Sampling retains at most 4096 bytes at each end, a fixed work buffer and
+     * the total length, without storing the complete stream in memory or a file.
+     * This bound excludes model, ONNX Runtime and caller-owned buffers or results.
+     * The same complete content produces the same result as {@link #identify(byte[])}.
+     * @param input the caller-owned stream, positioned at the start of the content
+     * @return an immutable result with no native resources to close
+     * @throws IllegalArgumentException if input is null
+     * @throws IllegalStateException if this instance has been closed; no bytes are read
+     * @throws MagikaException if reading fails, the stream exceeds the configured
+     *         limit (both INPUT failures), or inference fails
+     */
+    public DetectionResult identify(InputStream input) {
+        if (input == null) {
+            throw new IllegalArgumentException("input must not be null");
+        }
+        if (closed) {
+            throw new IllegalStateException("Magika is closed");
+        }
+        return adapter.identify(InputSample.fromStream(input, ModelAssets.WINDOW_SIZE, maxStreamBytes));
+    }
+
+    /**
      * Reports model provenance.
      * @return immutable version and asset information, also available after close
      */
@@ -106,6 +141,7 @@ public final class Magika implements AutoCloseable {
     public static final class Builder {
         private int intraOpThreads = 1;
         private PredictionMode predictionMode = PredictionMode.HIGH_CONFIDENCE;
+        private long maxStreamBytes = 67_108_864L;
 
         private Builder() { }
 
@@ -122,6 +158,23 @@ public final class Magika implements AutoCloseable {
                 throw new IllegalArgumentException("predictionMode must not be null");
             }
             predictionMode = mode;
+            return this;
+        }
+
+        /**
+         * Limits the number of remaining bytes accepted by stream identification.
+         * At most one additional byte is consumed to distinguish EOF from an
+         * oversized stream. This setting does not limit byte arrays or regular files.
+         * @param bytes a nonnegative limit; default 67,108,864 (64 MiB), zero accepts
+         *              only empty streams, and Long.MAX_VALUE is supported
+         * @return this builder
+         * @throws IllegalArgumentException if bytes is negative
+         */
+        public Builder maxStreamBytes(long bytes) {
+            if (bytes < 0) {
+                throw new IllegalArgumentException("maxStreamBytes must not be negative");
+            }
+            maxStreamBytes = bytes;
             return this;
         }
 
@@ -145,6 +198,6 @@ public final class Magika implements AutoCloseable {
          * @return a fully initialized instance owned by the caller
          * @throws MagikaException if validation or initialization fails
          */
-        public Magika build() { return new Magika(intraOpThreads, predictionMode); }
+        public Magika build() { return new Magika(intraOpThreads, predictionMode, maxStreamBytes); }
     }
 }

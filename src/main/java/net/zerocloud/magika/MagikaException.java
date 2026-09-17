@@ -11,7 +11,7 @@ public class MagikaException extends RuntimeException {
         ASSET_VALIDATION,
         /** Native loading, session creation, or model signature validation failed. */
         MODEL_INITIALIZATION,
-        /** A file is not a readable regular file, or sampling or handle closing failed. */
+        /** File/stream reading or owned-handle closing failed, or a stream exceeded its limit. */
         INPUT,
         /** Model execution or output validation failed. */
         INFERENCE,

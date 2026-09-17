@@ -173,6 +173,11 @@ public class PackagedIT {
     }
 
     @Test
+    public void generatedStreamLargerThanHeapAndIntRangeUsesBoundedSampling() throws Exception {
+        probe(sdkJar(), "64m", new String[0], "stream-large");
+    }
+
+    @Test
     public void specialAndUnreadableFilesFailWithoutBlocking() throws Exception {
         probe(sdkJar(), "128m", new String[0], "path-errors");
     }
@@ -230,7 +235,7 @@ public class PackagedIT {
         File log = temporary.newFile("probe-" + System.nanoTime() + ".log");
         Process process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log).start();
         try {
-            int timeout = args[0].startsWith("path-") ? 45 : 300;
+            int timeout = args[0].startsWith("path-") || args[0].startsWith("stream-") ? 45 : 300;
             assertTrue("Probe timed out: " + command, process.waitFor(timeout, TimeUnit.SECONDS));
             String output = new String(Files.readAllBytes(log.toPath()), StandardCharsets.UTF_8);
             System.out.print(output);

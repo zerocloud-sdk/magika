@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.EnumMap;
 import java.util.Locale;
@@ -86,6 +87,9 @@ public class ReferenceTest {
                 DetectionResult actual = instances.get(mode).identify(content);
                 String message = mode + " content reference #" + count;
                 maxError = Math.max(maxError, Fixtures.assertReference(message, expected, kb, actual));
+                DetectionResult streamed = instances.get(mode).identify(new ByteArrayInputStream(content));
+                maxError = Math.max(maxError, Fixtures.assertReference(message + " stream", expected, kb, streamed));
+                Fixtures.assertEquivalent(message + " stream/byte[]", actual, streamed);
                 if (actual.isModelUsed()) {
                     modelUses.put(mode, modelUses.get(mode) + 1);
                 }
@@ -101,6 +105,6 @@ public class ReferenceTest {
             assertEquals(mode + " model inferences", 43, (int) modelUses.get(mode));
             System.out.println(mode + " references: " + counts.get(mode) + ", modelUsed=" + modelUses.get(mode));
         }
-        System.out.println("All content references: " + count + ", max absolute score error=" + maxError);
+        System.out.println("All content references (byte[] and stream): " + count + ", max absolute score error=" + maxError);
     }
 }
