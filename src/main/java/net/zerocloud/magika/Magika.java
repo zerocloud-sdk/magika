@@ -1,8 +1,10 @@
 /* Copyright 2026 ZeroCloud SDK contributors. SPDX-License-Identifier: Apache-2.0 */
 package net.zerocloud.magika;
 
+import java.nio.file.Path;
+
 /**
- * Offline byte array identification using the bundled standard_v3_3 model and
+ * Offline byte array and regular file identification using the bundled standard_v3_3 model and
  * a configurable {@link PredictionMode}, defaulting to HIGH_CONFIDENCE.
  * Creating an instance eagerly validates assets and loads
  * a CPU ONNX Runtime session. Reuse instances for sequential calls.
@@ -50,7 +52,34 @@ public final class Magika implements AutoCloseable {
         if (closed) {
             throw new IllegalStateException("Magika is closed");
         }
-        return adapter.identify(content);
+        return adapter.identify(InputSample.fromBytes(content, ModelAssets.WINDOW_SIZE));
+    }
+
+    /**
+     * Identifies a regular file, following symbolic links. Directories, devices,
+     * pipes and other non-regular inputs are rejected before opening content.
+     * The SDK opens one file handle, randomly reads bounded head and tail windows,
+     * and closes its handle on success or failure. There is no default file size
+     * limit; sampling memory does not grow with the total file size.
+     *
+     * <p>Keep the file and its path stable throughout this call. The SDK provides
+     * no snapshot and does not detect every concurrent modification. Observable
+     * truncation or read failures throw an input error without retrying.
+     * @param path the saved regular file to identify
+     * @return an immutable result with no native resources to close
+     * @throws IllegalArgumentException if path is null
+     * @throws IllegalStateException if this instance has been closed
+     * @throws MagikaException if the input is not a readable regular file, sampling
+     *         or closing its handle fails, or inference fails
+     */
+    public DetectionResult identify(Path path) {
+        if (path == null) {
+            throw new IllegalArgumentException("path must not be null");
+        }
+        if (closed) {
+            throw new IllegalStateException("Magika is closed");
+        }
+        return adapter.identify(InputSample.fromPath(path, ModelAssets.WINDOW_SIZE));
     }
 
     /**

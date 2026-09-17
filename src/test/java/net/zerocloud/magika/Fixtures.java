@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import static org.junit.Assert.*;
 
@@ -54,5 +55,40 @@ final class Fixtures {
         return type.get("mime_type").isJsonNull()
                 ? (type.get("is_text").getAsBoolean() ? "text/plain" : "application/octet-stream")
                 : type.get("mime_type").getAsString();
+    }
+
+    static double assertReference(String message, JsonObject expected, JsonObject kb, DetectionResult actual) {
+        assertEquals(message, expected.get("output").getAsString(), actual.getLabel());
+        assertEquals(message, mime(kb, actual.getLabel()), actual.getMimeType());
+        assertEquals(message, OverwriteReason.valueOf(expected.get("overwrite_reason").getAsString()
+                .toUpperCase(Locale.ROOT)), actual.getOverwriteReason());
+        assertEquals(message, expected.get("score").getAsDouble(), actual.getScore(), 1e-5);
+        assertEquals("standard_v3_3", actual.getModelVersion());
+        String dl = expected.get("dl").getAsString();
+        if ("undefined".equals(dl)) {
+            assertFalse(message, actual.getRawPrediction().isPresent());
+            assertFalse(message, actual.isModelUsed());
+            assertEquals(1.0, actual.getScore(), 0);
+            assertEquals(OverwriteReason.NONE, actual.getOverwriteReason());
+        } else {
+            assertTrue(message, actual.isModelUsed());
+            assertEquals(message, dl, actual.getRawPrediction().get().getLabel());
+            assertEquals(actual.getScore(), actual.getRawPrediction().get().getScore(), 0);
+        }
+        return Math.abs(expected.get("score").getAsDouble() - actual.getScore());
+    }
+
+    static void assertEquivalent(String message, DetectionResult expected, DetectionResult actual) {
+        assertEquals(message, expected.getLabel(), actual.getLabel());
+        assertEquals(message, expected.getMimeType(), actual.getMimeType());
+        assertEquals(message, expected.getScore(), actual.getScore(), 0);
+        assertEquals(message, expected.getOverwriteReason(), actual.getOverwriteReason());
+        assertEquals(message, expected.isModelUsed(), actual.isModelUsed());
+        assertEquals(message, expected.getModelVersion(), actual.getModelVersion());
+        assertEquals(message, expected.getRawPrediction().isPresent(), actual.getRawPrediction().isPresent());
+        if (expected.getRawPrediction().isPresent()) {
+            assertEquals(message, expected.getRawPrediction().get().getLabel(), actual.getRawPrediction().get().getLabel());
+            assertEquals(message, expected.getRawPrediction().get().getScore(), actual.getRawPrediction().get().getScore(), 0);
+        }
     }
 }

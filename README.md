@@ -1,13 +1,14 @@
 # Magika Java SDK
 
 An independently maintained Java 8 SDK by ZeroCloud SDK. It identifies complete
-byte arrays offline using Google's bundled `standard_v3_3` Magika model and the
+byte arrays and saved regular files offline using Google's bundled `standard_v3_3` Magika model and the
 official ONNX Runtime CPU dependency, version `1.30.0`.
 
-This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2) and
-[issue #3](https://github.com/zerocloud-sdk/magika/issues/3): sequential byte array
+This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2),
+[issue #3](https://github.com/zerocloud-sdk/magika/issues/3) and
+[issue #4](https://github.com/zerocloud-sdk/magika/issues/4): sequential byte array and file
 identification with all three official prediction modes, defaulting to
-**HIGH_CONFIDENCE**. File/stream/batch APIs, concurrent use and release
+**HIGH_CONFIDENCE**. Stream/batch APIs, concurrent use and release
 publication are separate tickets. Version `0.1.0` here is a local build, not a claim
 that a release has been published to Maven Central.
 
@@ -61,6 +62,45 @@ Reuse an instance for sequential calls. The caller must serialize calls to
 closing releases the Session before SessionOptions and leaves the JVM-shared
 OrtEnvironment alone. Repeated sequential close is harmless. Identification after
 close throws `IllegalStateException`. `getModelInfo()` remains usable after close.
+
+## Saved uploads and regular files
+
+Save the complete upload and finish writing before passing its `Path`:
+
+```java
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import net.zerocloud.magika.DetectionResult;
+import net.zerocloud.magika.Magika;
+
+Path savedUpload = Paths.get("uploads", "completed-upload.bin");
+try (Magika magika = Magika.create()) {
+    DetectionResult result = magika.identify(savedUpload);
+    System.out.println(result.getLabel() + " " + result.getMimeType());
+}
+```
+
+The [runnable saved-upload example](examples/offline/src/main/java/example/SavedUploadExample.java)
+copies an application-owned upload stream into a temporary file, closes the stream,
+identifies the saved file and deletes it. It compiles against the installed SDK and
+also runs in the isolated consumer below.
+
+`identify(Path)` follows symbolic links and accepts only regular files. Directories,
+devices and pipes are rejected before opening content; broken links, missing files
+and unreadable files fail with `MagikaException.Category.INPUT`. The exception
+includes the supplied path in `getContext()` and preserves the available original
+cause in `getCause()`. Input failures throw; they never return `unknown` or retry.
+A null `Path` throws `IllegalArgumentException`.
+
+The SDK opens one read handle, seeks to the head and tail, and closes its handle
+before inference, including on sampling failures. Each raw window is at most
+4096 bytes. There is no default file size limit, and sampling buffers do not grow
+with file length. This bound excludes model/ORT memory and application buffers.
+The application owns the file and must keep both its content and path stable
+throughout identification, including symbolic-link targets. The SDK provides no
+snapshot and cannot detect every concurrent modification. Observable truncation,
+read failures or size changes during sampling report input errors without retrying.
+Same-content files and complete byte arrays use the same rules in all three modes.
 
 ## Prediction modes
 
@@ -149,6 +189,7 @@ strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
 | Identification after close | `IllegalStateException` |
 | Missing, corrupt or inconsistent assets | `MagikaException`, category `ASSET_VALIDATION` |
 | Native loading, Session initialization or signature failure | `MagikaException`, category `MODEL_INITIALIZATION` |
+| Non-regular, missing or unreadable file; sampling or file-handle close failure | `MagikaException`, category `INPUT` |
 | Inference/output failure | `MagikaException`, category `INFERENCE` |
 | Instance resource-release failure | `MagikaException`, category `RESOURCE_RELEASE` |
 
@@ -195,7 +236,10 @@ loading errors retain their cause in `MagikaException`.
 `mvn verify` is the acceptance entry point: Java tests read the original static
 gzip fixtures, exercise real ORT, validate packaged resources and bytecode, reject
 altered assets, and run separate JVM probes for bounded input copying, native
-thread configuration, and sequential native resource reuse. Javadoc generation
+thread configuration, sequential native resource reuse, a file larger than the
+heap, input errors and owned file handles. Special-file probes have a process timeout;
+permission checks require a real denied open by an unprivileged test user.
+Javadoc generation
 also runs and rejects documentation warnings. No Python generation step is used.
 
 To build with JDK 21 and really execute all tests and native inference on each
@@ -214,19 +258,26 @@ done
 The test logs print the actual runtime version, vendor, home, OS/architecture and
 native ORT version. [CI](.github/workflows/verify.yml) uses Ubuntu 24.04 x64, JDK 21
 for compilation, separate Java 8/17/21 test JVMs, and the isolated packaged consumer.
-The [prediction-mode verification record](docs/verification-issue-3.md) and
+The [regular-file verification record](docs/verification-issue-4.md),
+[prediction-mode verification record](docs/verification-issue-3.md) and
 [initial SDK verification record](docs/verification-issue-2.md) record executed checks and
 limits. Platform evidence is limited to Ubuntu 24.04 x64 / CPU; other distributions,
 architectures, libc versions and GPU execution are not verified.
 
 The [asset manifest](src/main/resources/net/zerocloud/magika/model/asset-manifest.json)
 records the fixed upstream commit, model contract, exact byte sizes, sources,
-SHA-256 digests, license, and both static reference datasets. Reference input bytes
-are embedded in the original fixtures; these fixtures are test-only. The 9,261
+SHA-256 digests, license, and both original feature/content reference datasets.
+The separate [path manifest](src/test/resources/reference/path-manifest.json)
+pins the path reference and all 69 original files to the same upstream commit,
+with per-file sources, sizes and SHA-256 digests. All references and original
+input files are test-only and excluded from the production JAR. The 9,261
 feature cases use head 128, tail 64 and window 512; separate boundary tests cover
 the actual model's 1024/1024 and 4096 configuration. All 141 content cases are
 checked through the public API, exactly 47 per mode, with exact raw/final labels,
 overwrite reasons and MIME strings, and absolute score error at most `1e-5`.
+All 207 path cases are checked through public `identify(Path)`, exactly 69 per mode,
+against both the fixed reference and complete `byte[]` results. Boundary cases
+also compare their exact features through the restricted feature contract.
 Neither these cases nor the deterministic rule tests
 establish accuracy for all 214 model classes.
 
@@ -238,6 +289,8 @@ acceptance:
   padding, whitespace and strict UTF-8 boundaries.
 - All content references in each of the three modes (currently 141, 47 per mode),
   checking raw/final labels, reasons, MIME and the `1e-5` score tolerance.
+- All 207 path references and 69 authenticated original files, plus Path/byte[]
+  feature and result equality, file errors, single-handle ownership and bounded sampling.
 - HIGH/MEDIUM below/equal/above threshold cases, per-label threshold defaults,
   mapping, text/binary fallback, unchanged-label reasons and BEST_GUESS low scores.
 - Rule short circuits for empty/short content in every mode: absent raw

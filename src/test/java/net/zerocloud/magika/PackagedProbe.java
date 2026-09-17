@@ -18,6 +18,11 @@ public final class PackagedProbe {
         check(Magika.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(".jar"),
                 "Probe must consume the packaged SDK, not target/classes");
         switch (args[0]) {
+            case "path-large":
+            case "path-errors":
+            case "path-handles":
+                PathProbe.run(args[0]);
+                break;
             case "smoke":
                 try (Magika sdk = Magika.create()) {
                     check("pdf".equals(sdk.identify(PDF).getLabel()), "PDF identification");
@@ -144,7 +149,7 @@ public final class PackagedProbe {
         try {
             result = sdk.identify(PDF);
             try {
-                sdk.identify(null);
+                sdk.identify((byte[]) null);
                 throw new AssertionError("Null input succeeded");
             } catch (IllegalArgumentException expected) {
                 check("pdf".equals(sdk.identify(PDF).getLabel()), "Argument failure damaged instance");

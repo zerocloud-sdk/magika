@@ -7,7 +7,7 @@
   <artifactId>magika</artifactId>
   <version>0.1.0</version>
   <name>Magika Java SDK</name>
-  <description>Offline byte array content identification using the bundled Magika model.</description>
+  <description>Offline byte array and regular file identification using the bundled Magika model.</description>
   <url>https://github.com/zerocloud-sdk/magika</url>
   <licenses>
     <license>

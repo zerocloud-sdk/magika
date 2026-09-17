@@ -1,4 +1,4 @@
-name: Verify offline byte-array SDK
+name: Verify offline byte-array and file SDK
 on:
   push:
   pull_request:

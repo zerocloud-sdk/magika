@@ -11,6 +11,8 @@ public class MagikaException extends RuntimeException {
         ASSET_VALIDATION,
         /** Native loading, session creation, or model signature validation failed. */
         MODEL_INITIALIZATION,
+        /** A file is not a readable regular file, or sampling or handle closing failed. */
+        INPUT,
         /** Model execution or output validation failed. */
         INFERENCE,
         /** Releasing instance resources failed. */
@@ -24,7 +26,7 @@ public class MagikaException extends RuntimeException {
     private final Category category;
     /**
      * Available operation context.
-     * @serial Asset, model, or input-length context.
+     * @serial Asset, model, input-path or input-length context.
      */
     private final String context;
 
@@ -42,7 +44,7 @@ public class MagikaException extends RuntimeException {
 
     /**
      * Describes the affected operation.
-     * @return available context such as the asset filename or input length
+     * @return available context such as the asset filename, input path or input length
      */
     public String getContext() { return context; }
 }

@@ -85,24 +85,8 @@ public class ReferenceTest {
                 byte[] content = Base64.getDecoder().decode(example.get("content_base64").getAsString());
                 DetectionResult actual = instances.get(mode).identify(content);
                 String message = mode + " content reference #" + count;
-                assertEquals(message, expected.get("output").getAsString(), actual.getLabel());
-                assertEquals(message, Fixtures.mime(kb, actual.getLabel()), actual.getMimeType());
-                assertEquals(message, OverwriteReason.valueOf(expected.get("overwrite_reason").getAsString()
-                        .toUpperCase(Locale.ROOT)), actual.getOverwriteReason());
-                assertEquals(message, expected.get("score").getAsDouble(), actual.getScore(), 1e-5);
-                maxError = Math.max(maxError, Math.abs(expected.get("score").getAsDouble() - actual.getScore()));
-                assertEquals("standard_v3_3", actual.getModelVersion());
-                String dl = expected.get("dl").getAsString();
-                if ("undefined".equals(dl)) {
-                    assertFalse(message, actual.getRawPrediction().isPresent());
-                    assertFalse(message, actual.isModelUsed());
-                    assertEquals(1.0, actual.getScore(), 0);
-                    assertEquals(OverwriteReason.NONE, actual.getOverwriteReason());
-                } else {
-                    assertTrue(message, actual.isModelUsed());
-                    RawPrediction raw = actual.getRawPrediction().get();
-                    assertEquals(message, dl, raw.getLabel());
-                    assertEquals(actual.getScore(), raw.getScore(), 0);
+                maxError = Math.max(maxError, Fixtures.assertReference(message, expected, kb, actual));
+                if (actual.isModelUsed()) {
                     modelUses.put(mode, modelUses.get(mode) + 1);
                 }
                 counts.put(mode, counts.get(mode) + 1);

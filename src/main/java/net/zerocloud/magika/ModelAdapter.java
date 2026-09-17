@@ -12,7 +12,6 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.TensorInfo;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
@@ -81,17 +80,16 @@ final class ModelAdapter implements AutoCloseable {
 
     ModelInfo modelInfo() { return assets.info; }
 
-    DetectionResult identify(byte[] content) {
-        if (content.length == 0) {
+    DetectionResult identify(InputSample sample) {
+        if (sample.length == 0) {
             return ruleResult("empty");
         }
-        if (content.length < ModelAssets.MIN_MODEL_BYTES) {
-            return fewBytes(content);
+        if (sample.length < ModelAssets.MIN_MODEL_BYTES) {
+            return fewBytes(sample);
         }
-        int[] features = Features.extract(content, ModelAssets.HEAD_SIZE, ModelAssets.TAIL_SIZE,
-                ModelAssets.WINDOW_SIZE, ModelAssets.PADDING);
+        int[] features = Features.extract(sample, ModelAssets.HEAD_SIZE, ModelAssets.TAIL_SIZE, ModelAssets.PADDING);
         if (features[ModelAssets.MIN_MODEL_BYTES - 1] == ModelAssets.PADDING) {
-            return fewBytes(content);
+            return fewBytes(sample);
         }
         try (OnnxTensor input = OnnxTensor.createTensor(environment, IntBuffer.wrap(features),
                      new long[] {1, features.length});
@@ -113,7 +111,7 @@ final class ModelAdapter implements AutoCloseable {
             return resultForPrediction(assets, new RawPrediction(assets.labels.get(top), scores[top]), predictionMode);
         } catch (OrtException | RuntimeException | LinkageError failure) {
             throw new MagikaException(MagikaException.Category.INFERENCE,
-                    ModelAssets.MODEL_VERSION + ", byteLength=" + content.length,
+                    ModelAssets.MODEL_VERSION + ", byteLength=" + sample.length,
                     "Cannot execute model inference", failure);
         }
     }
@@ -135,12 +133,12 @@ final class ModelAdapter implements AutoCloseable {
                 OverwriteReason.NONE, ModelAssets.MODEL_VERSION);
     }
 
-    private DetectionResult fewBytes(byte[] content) {
+    private DetectionResult fewBytes(InputSample sample) {
         try {
             StandardCharsets.UTF_8.newDecoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
-                    .decode(ByteBuffer.wrap(content, 0, Math.min(content.length, ModelAssets.WINDOW_SIZE)));
+                    .decode(sample.head.duplicate());
             return ruleResult("txt");
         } catch (CharacterCodingException e) {
             return ruleResult("unknown");

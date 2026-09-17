@@ -168,6 +168,21 @@ public class PackagedIT {
     }
 
     @Test
+    public void fileLargerThanHeapAndIntRangeUsesBoundedSampling() throws Exception {
+        probe(sdkJar(), "64m", new String[0], "path-large");
+    }
+
+    @Test
+    public void specialAndUnreadableFilesFailWithoutBlocking() throws Exception {
+        probe(sdkJar(), "128m", new String[0], "path-errors");
+    }
+
+    @Test
+    public void singleFileHandleSurvivesReplacementAndClosesOnReadFailures() throws Exception {
+        probe(sdkJar(), "128m", new String[0], "path-handles");
+    }
+
+    @Test
     public void configuredThreadCountsCreateNativeWorkersAndCloseReleasesThem() throws Exception {
         probe(sdkJar(), "256m", new String[0], "threads");
     }
@@ -215,12 +230,14 @@ public class PackagedIT {
         File log = temporary.newFile("probe-" + System.nanoTime() + ".log");
         Process process = new ProcessBuilder(command).redirectErrorStream(true).redirectOutput(log).start();
         try {
-            assertTrue("Probe timed out: " + command, process.waitFor(300, TimeUnit.SECONDS));
+            int timeout = args[0].startsWith("path-") ? 45 : 300;
+            assertTrue("Probe timed out: " + command, process.waitFor(timeout, TimeUnit.SECONDS));
             String output = new String(Files.readAllBytes(log.toPath()), StandardCharsets.UTF_8);
             System.out.print(output);
             assertEquals(output, 0, process.exitValue());
         } finally {
             process.destroyForcibly();
+            assertTrue("Probe did not terminate", process.waitFor(10, TimeUnit.SECONDS));
         }
     }
 

@@ -67,7 +67,7 @@ public class MagikaTest {
                 () -> Magika.builder().predictionMode(null));
         assertTrue(invalidMode.getMessage().contains("predictionMode"));
         try (Magika magika = Magika.create()) {
-            assertThrows(IllegalArgumentException.class, () -> magika.identify(null));
+            assertThrows(IllegalArgumentException.class, () -> magika.identify((byte[]) null));
             assertEquals("pdf", magika.identify(PDF).getLabel());
         }
     }

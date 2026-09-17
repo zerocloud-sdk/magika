@@ -40,6 +40,7 @@ public final class OfflineExample {
                     + magika.getModelInfo().getModelVersion() + "; Java " + System.getProperty("java.runtime.version"));
         }
         System.out.println(result.getLabel() + " " + result.getMimeType() + " score=" + result.getScore());
+        SavedUploadExample.main(new String[0]);
 
         byte[] ambiguousContent = {0, 1, 2, 3, 4, 5, 6, 7};
         for (PredictionMode mode : PredictionMode.values()) {
