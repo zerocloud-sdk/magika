@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "fixedReviewBase": "0d115930896a3c30d61a54418085420833c974fb",
+  "sourceSha": "5f74b9884329703cce5b888408fc741d1ba8d444",
+  "coordinate": "net.zerocloud:magika:0.1.0",
+  "model": "standard_v3_3",
+  "platform": "Ubuntu 24.04.5 LTS x86_64 / CPU",
+  "compiler": "Eclipse Temurin 21.0.12.1+1-LTS",
+  "rehearsalRun": "https://github.com/zerocloud-sdk/magika/actions/runs/35283223620",
+  "verificationRun": "https://github.com/zerocloud-sdk/magika/actions/runs/35283191076",
+  "releaseToolTests": {
+    "tests": 28,
+    "failures": 0,
+    "skipped": 0
+  },
+  "matrix": [
+    {
+      "runtime": "8",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "javaRuntimeVersion": "1.8.0_504-b01",
+      "javaVendor": "Temurin",
+      "signedConsumer": {
+        "signaturesVerified": 4,
+        "loadedSdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "matchingCandidateRepositoryAndCopiedJars": true,
+        "offlineMavenBuild": true,
+        "javaOnlyNoExternalNetwork": true
+      }
+    },
+    {
+      "runtime": "17",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "javaRuntimeVersion": "17.0.20.1+1",
+      "javaVendor": "Eclipse Adoptium",
+      "signedConsumer": {
+        "signaturesVerified": 4,
+        "loadedSdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "matchingCandidateRepositoryAndCopiedJars": true,
+        "offlineMavenBuild": true,
+        "javaOnlyNoExternalNetwork": true
+      }
+    },
+    {
+      "runtime": "21",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "javaRuntimeVersion": "21.0.12.1+1-LTS",
+      "javaVendor": "Eclipse Adoptium",
+      "signedConsumer": {
+        "signaturesVerified": 4,
+        "loadedSdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "matchingCandidateRepositoryAndCopiedJars": true,
+        "offlineMavenBuild": true,
+        "javaOnlyNoExternalNetwork": true
+      }
+    }
+  ],
+  "candidate": {
+    "schema": 1,
+    "coordinate": "net.zerocloud:magika:0.1.0",
+    "version": "0.1.0",
+    "sourceSha": "5f74b9884329703cce5b888408fc741d1ba8d444",
+    "artifacts": {
+      "magika-0.1.0-javadoc.jar": {
+        "bytes": 172460,
+        "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+      },
+      "magika-0.1.0-sources.jar": {
+        "bytes": 45033,
+        "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+      },
+      "magika-0.1.0.jar": {
+        "bytes": 2978079,
+        "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+      },
+      "magika-0.1.0.pom": {
+        "bytes": 7063,
+        "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+      }
+    },
+    "model": "standard_v3_3",
+    "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+    "assets": [
+      {
+        "file": "model.onnx",
+        "bytes": 3163737,
+        "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/model.onnx"
+      },
+      {
+        "file": "config.min.json",
+        "bytes": 2141,
+        "sha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/config.min.json"
+      },
+      {
+        "file": "content_types_kb.min.json",
+        "bytes": 44768,
+        "sha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/content_types_kb.min.json"
+      }
+    ],
+    "javaClassVersion": 52,
+    "classes": 27,
+    "contentSha256": "ba0b335229004f31c9ad6c9e3e68efdcf9f5e638fc6d51085ade8819a6d1a297",
+    "signingFingerprint": "C5149FD6B5EF7C2126F1FD0FCC1A12E348E171D8",
+    "signatures": {
+      "magika-0.1.0-javadoc.jar.asc": {
+        "bytes": 833,
+        "sha256": "261edacd539839defb19c79ab1c80e3c3b8fc353fd27c721ddd9bb58bfb01b0c"
+      },
+      "magika-0.1.0-sources.jar.asc": {
+        "bytes": 833,
+        "sha256": "4121a711f836ef996a3938c8fbec8c06cdc4102d069b403883b3ba17c38f4a1c"
+      },
+      "magika-0.1.0.jar.asc": {
+        "bytes": 833,
+        "sha256": "fc63862c8ef206ea43146539e29d0d716ffe47c31f807e062a11cc2de165f635"
+      },
+      "magika-0.1.0.pom.asc": {
+        "bytes": 833,
+        "sha256": "4c308d5f4a4030bf545bcbf8622be467312f4c5d5277166b6a943db98aeace9b"
+      }
+    },
+    "bundleSha256": "017d2a8d4e9ed93b5eba5b53c766129794b1bf29d1a69c5a478e6f141196a581"
+  },
+  "releaseEnvironment": {
+    "checkedAt": "2026-09-17T22:43:46.756Z",
+    "fingerprint": "C5149FD6B5EF7C2126F1FD0FCC1A12E348E171D8",
+    "environment": "maven-central",
+    "central": [
+      {
+        "endpoint": "/api/v1/publisher/deployments?namespace=net.zerocloud&size=1",
+        "status": 200,
+        "totalResultCount": 0
+      },
+      {
+        "endpoint": "/api/v1/publisher/published?namespace=net.zerocloud&name=magika&version=0.1.0",
+        "status": 200,
+        "published": false
+      }
+    ],
+    "gpgChallengeVerified": true,
+    "publicKeyServer": "keyserver.ubuntu.com",
+    "publicKeyFingerprintVerified": true,
+    "github": [
+      {
+        "endpoint": "/git/ref/tags/v0.1.0",
+        "status": 404,
+        "exists": false
+      },
+      {
+        "endpoint": "/releases/tags/v0.1.0",
+        "status": 404,
+        "exists": false
+      },
+      {
+        "endpoint": "/git/ref/heads/release-ledger",
+        "status": 404,
+        "exists": false
+      }
+    ],
+    "secretsConfigured": [
+      "CENTRAL_PASSWORD",
+      "CENTRAL_USERNAME",
+      "MAVEN_GPG_PASSPHRASE",
+      "MAVEN_GPG_PRIVATE_KEY"
+    ],
+    "fingerprintVariableVerified": true
+  },
+  "review": {
+    "standards": {
+      "initialHardViolations": 0,
+      "initialHeuristics": 1,
+      "remaining": 0
+    },
+    "spec": {
+      "initialP1": 1,
+      "initialP2": 1,
+      "remaining": 0
+    }
+  },
+  "originalUntrackedFiles": {
+    "count": 24,
+    "pathsAndContentsPreserved": true,
+    "remainUntracked": true
+  },
+  "formalPublicationPerformed": false,
+  "localSignedConsumer": {
+    "javaRuntimeVersion": "1.8.0_492-8u492-ga~us2-0ubuntu1~24.04.1-b09",
+    "sourceSha": "5f74b9884329703cce5b888408fc741d1ba8d444",
+    "loadedSdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+    "javaOnlyNoExternalNetwork": true,
+    "matchingCandidateRepositoryAndCopiedJars": true
+  }
+}
