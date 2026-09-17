@@ -4,32 +4,20 @@ An independently maintained Java 8 SDK by ZeroCloud SDK. It identifies complete
 byte arrays, saved regular files, streams and lazy batches of paths offline using Google's bundled `standard_v3_3` Magika model and the
 official ONNX Runtime CPU dependency, version `1.30.0`.
 
-This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2),
-[issue #3](https://github.com/zerocloud-sdk/magika/issues/3),
-[issue #4](https://github.com/zerocloud-sdk/magika/issues/4),
-[issue #5](https://github.com/zerocloud-sdk/magika/issues/5),
-[issue #6](https://github.com/zerocloud-sdk/magika/issues/6) and
-[issue #7](https://github.com/zerocloud-sdk/magika/issues/7): concurrent byte array, file, stream and batch
-identification with all three official prediction modes, defaulting to
-**HIGH_CONFIDENCE**. Release publication is a separate ticket.
-Version `0.1.0` here is a local build, not a claim
-that a release has been published to Maven Central.
+Version **0.1.0** is published to
+[Maven Central](https://central.sonatype.com/artifact/net.zerocloud/magika/0.1.0).
+Concurrent byte array, file, stream and batch identification support all three
+official prediction modes, defaulting to **HIGH_CONFIDENCE**.
 
-The [signed-candidate rehearsal and release guide](docs/releasing.md) documents
-the #9 distribution checks, isolated Maven consumption, gated workflow and
-deployment recovery. Formal publication remains the separate #10 acceptance.
+The [v0.1.0 Release](https://github.com/zerocloud-sdk/magika/releases/tag/v0.1.0)
+identifies the source and model assets. The [formal acceptance record](docs/verification-issue-10.md)
+includes the complete Java 8/17/21 gates, direct Central downloads, Java-only
+offline consumption, performance provenance and all 16 parent-spec acceptance items.
+The [release guide](docs/releasing.md) covers signing, publication and recovery.
 
-## Build and use
+## Install and use
 
-Build with JDK 21 and Maven 3.8.7 or later. Compilation uses `--release 8`, including
-the Java 8 standard API check. On the verified Ubuntu installation:
-
-```sh
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-mvn -B -ntp clean install
-```
-
-After installation, a consumer can depend on:
+Add the published dependency to your Maven project:
 
 ```xml
 <dependency>
@@ -383,7 +371,7 @@ Gson also brings Error Prone annotations. Install those dependencies once, then
 run without network access or Python. There is no runtime asset download.
 
 The [standalone consumer](examples/offline) has no parent POM or dependency on
-the SDK source tree. After the SDK installation above:
+the SDK source tree. Maven resolves its published SDK dependency from Central:
 
 ```sh
 mvn -B -ntp -f examples/offline/pom.xml clean package
@@ -407,6 +395,11 @@ native-library directory; it is not an extraction-directory setting. Native
 loading errors retain their cause in `MagikaException`.
 
 ## Verification and provenance
+
+Build from source with JDK 21 and Maven 3.8.7 or later. Compilation uses
+`--release 8`, including the Java 8 standard API check. `mvn -B -ntp clean install`
+builds, tests and installs the local SDK. For byte-identical release artifacts,
+use the pinned Temurin 21.0.12.1+1 compiler described in the release guide.
 
 `mvn verify` is the acceptance entry point: Java tests read the original static
 gzip fixtures, exercise real ORT, validate packaged resources and bytecode, reject

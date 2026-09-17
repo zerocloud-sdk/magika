@@ -1,0 +1,2903 @@
+{
+  "schema": 1,
+  "fixedReviewBase": "65cb8714f42be2632548c2a28513371b070baf5a",
+  "releaseSourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+  "coordinate": "net.zerocloud:magika:0.1.0",
+  "model": "standard_v3_3",
+  "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+  "assets": [
+    {
+      "file": "model.onnx",
+      "bytes": 3163737,
+      "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/model.onnx"
+    },
+    {
+      "file": "config.min.json",
+      "bytes": 2141,
+      "sha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/config.min.json"
+    },
+    {
+      "file": "content_types_kb.min.json",
+      "bytes": 44768,
+      "sha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+      "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/content_types_kb.min.json"
+    }
+  ],
+  "releaseRun": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752",
+  "releaseRunId": 35286463752,
+  "releaseAttempts": {
+    "initial": {
+      "conclusion": "failure",
+      "databaseId": 35286463752,
+      "event": "workflow_dispatch",
+      "headSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+      "jobs": [
+        {
+          "completedAt": "2026-09-17T23:21:29Z",
+          "conclusion": "success",
+          "databaseId": 105419785820,
+          "name": "source",
+          "startedAt": "2026-09-17T23:21:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:27Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:27Z",
+              "conclusion": "success",
+              "name": "Validate immutable source input",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Run actual=$(git rev-parse HEAD)",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 8,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105419785820"
+        },
+        {
+          "completedAt": "2026-09-17T23:27:11Z",
+          "conclusion": "success",
+          "databaseId": 105419806254,
+          "name": "verify / verify (8)",
+          "startedAt": "2026-09-17T23:21:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:35Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:40Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:58Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:58Z",
+              "conclusion": "skipped",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:59Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:01Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:06Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:27:01Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:27:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:27:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:27:08Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105419806254"
+        },
+        {
+          "completedAt": "2026-09-17T23:26:53Z",
+          "conclusion": "success",
+          "databaseId": 105419806268,
+          "name": "verify / verify (21)",
+          "startedAt": "2026-09-17T23:21:31Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:32Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:33Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:38Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:44Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:47Z",
+              "conclusion": "success",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:47Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:48Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:50Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:26:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:26:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:52Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:52Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:26:52Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105419806268"
+        },
+        {
+          "completedAt": "2026-09-17T23:26:33Z",
+          "conclusion": "success",
+          "databaseId": 105419806281,
+          "name": "verify / verify (17)",
+          "startedAt": "2026-09-17T23:21:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:36Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:41Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:41Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "skipped",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:21Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:29Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:26:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:26:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:31Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:31Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:26:31Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105419806281"
+        },
+        {
+          "completedAt": "2026-09-17T23:27:30Z",
+          "conclusion": "success",
+          "databaseId": 105421140027,
+          "name": "sign",
+          "startedAt": "2026-09-17T23:27:13Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:15Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:17Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:15Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:21Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:22Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:22Z",
+              "conclusion": "success",
+              "name": "Require identical distribution bytes from all three verification jobs",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:26Z",
+              "conclusion": "success",
+              "name": "Sign with the configured release key or recover the identical stored candidate",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:28Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:28Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 15,
+              "startedAt": "2026-09-17T23:27:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 16,
+              "startedAt": "2026-09-17T23:27:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 17,
+              "startedAt": "2026-09-17T23:27:29Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105421140027"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:07Z",
+          "conclusion": "success",
+          "databaseId": 105421214242,
+          "name": "consume (21)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:35Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:39Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:05Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:05Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105421214242"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:34Z",
+          "conclusion": "success",
+          "databaseId": 105421214255,
+          "name": "consume (17)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:36Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:39Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:51Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:30Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:31Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:31Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105421214255"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:15Z",
+          "conclusion": "success",
+          "databaseId": 105421214335,
+          "name": "consume (8)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:35Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:36Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:40Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:46Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:12Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:46Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:14Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:14Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:14Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105421214335"
+        },
+        {
+          "completedAt": "2026-09-17T23:29:22Z",
+          "conclusion": "failure",
+          "databaseId": 105421454331,
+          "name": "publish",
+          "startedAt": "2026-09-17T23:28:37Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:28:39Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:28:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:40Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:28:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:45Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:28:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:48Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 4,
+              "startedAt": "2026-09-17T23:28:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:29:19Z",
+              "conclusion": "failure",
+              "name": "Preserve candidate and deployment identity, reconcile external state, publish and complete GitHub records",
+              "number": 5,
+              "startedAt": "2026-09-17T23:28:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:29:19Z",
+              "conclusion": "skipped",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 9,
+              "startedAt": "2026-09-17T23:29:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:29:19Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 10,
+              "startedAt": "2026-09-17T23:29:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:29:19Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "startedAt": "2026-09-17T23:29:19Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105421454331"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/attempts/1"
+    },
+    "final": {
+      "conclusion": "success",
+      "databaseId": 35286463752,
+      "event": "workflow_dispatch",
+      "headSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+      "jobs": [
+        {
+          "completedAt": "2026-09-17T23:21:29Z",
+          "conclusion": "success",
+          "databaseId": 105423897678,
+          "name": "source",
+          "startedAt": "2026-09-17T23:21:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:27Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:27Z",
+              "conclusion": "success",
+              "name": "Validate immutable source input",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Run actual=$(git rev-parse HEAD)",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 8,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:28Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "startedAt": "2026-09-17T23:21:28Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423897678"
+        },
+        {
+          "completedAt": "2026-09-17T23:27:11Z",
+          "conclusion": "success",
+          "databaseId": 105423898569,
+          "name": "verify / verify (8)",
+          "startedAt": "2026-09-17T23:21:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:35Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:40Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:44Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:58Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:58Z",
+              "conclusion": "skipped",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:59Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:01Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:06Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:27:01Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:27:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:07Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:27:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:27:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:08Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:27:08Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423898569"
+        },
+        {
+          "completedAt": "2026-09-17T23:27:30Z",
+          "conclusion": "success",
+          "databaseId": 105423898592,
+          "name": "sign",
+          "startedAt": "2026-09-17T23:27:13Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:15Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:17Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:15Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:21Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:22Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:22Z",
+              "conclusion": "success",
+              "name": "Require identical distribution bytes from all three verification jobs",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:26Z",
+              "conclusion": "success",
+              "name": "Sign with the configured release key or recover the identical stored candidate",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:28Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:28Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 15,
+              "startedAt": "2026-09-17T23:27:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 16,
+              "startedAt": "2026-09-17T23:27:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:29Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 17,
+              "startedAt": "2026-09-17T23:27:29Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423898592"
+        },
+        {
+          "completedAt": "2026-09-17T23:26:33Z",
+          "conclusion": "success",
+          "databaseId": 105423898599,
+          "name": "verify / verify (17)",
+          "startedAt": "2026-09-17T23:21:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:36Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:41Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:41Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:47Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "skipped",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:20Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:21Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:29Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:26:21Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:26:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:30Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:31Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:26:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:31Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:26:31Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423898599"
+        },
+        {
+          "completedAt": "2026-09-17T23:26:53Z",
+          "conclusion": "success",
+          "databaseId": 105423898654,
+          "name": "verify / verify (21)",
+          "startedAt": "2026-09-17T23:21:31Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:21:32Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:21:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:33Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:21:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:38Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:21:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Install build JDK 21",
+              "number": 4,
+              "startedAt": "2026-09-17T23:21:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Save compiler path",
+              "number": 5,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:21:42Z",
+              "conclusion": "success",
+              "name": "Install test JVM",
+              "number": 6,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:44Z",
+              "conclusion": "success",
+              "name": "Build with 21; verify and install using selected test JVM",
+              "number": 7,
+              "startedAt": "2026-09-17T23:21:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:47Z",
+              "conclusion": "success",
+              "name": "Verify supported vocabulary, cryptographic checks and release recovery scenarios",
+              "number": 8,
+              "startedAt": "2026-09-17T23:26:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:47Z",
+              "conclusion": "success",
+              "name": "Inspect complete unsigned distribution from this exact source",
+              "number": 9,
+              "startedAt": "2026-09-17T23:26:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:48Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-09-17T23:26:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:50Z",
+              "conclusion": "success",
+              "name": "Consume packaged SDK with no network or Python",
+              "number": 11,
+              "startedAt": "2026-09-17T23:26:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Preserve actual JVM and verification evidence",
+              "number": 12,
+              "startedAt": "2026-09-17T23:26:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Install test JVM",
+              "number": 21,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Install build JDK 21",
+              "number": 22,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:51Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 23,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:52Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 24,
+              "startedAt": "2026-09-17T23:26:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:26:52Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-09-17T23:26:52Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423898654"
+        },
+        {
+          "completedAt": "2026-09-17T23:39:42Z",
+          "conclusion": "success",
+          "databaseId": 105423898918,
+          "name": "publish",
+          "startedAt": "2026-09-17T23:39:22Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:39:24Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:39:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:28Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:39:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:32Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:39:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:34Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 4,
+              "startedAt": "2026-09-17T23:39:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:39Z",
+              "conclusion": "success",
+              "name": "Preserve candidate and deployment identity, reconcile external state, publish and complete GitHub records",
+              "number": 5,
+              "startedAt": "2026-09-17T23:39:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:39Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 9,
+              "startedAt": "2026-09-17T23:39:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:40Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 10,
+              "startedAt": "2026-09-17T23:39:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:39:40Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "startedAt": "2026-09-17T23:39:40Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423898918"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:34Z",
+          "conclusion": "success",
+          "databaseId": 105423899144,
+          "name": "consume (17)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:36Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:39Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:50Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:51Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:30Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:31Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:31Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:32Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:32Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423899144"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:15Z",
+          "conclusion": "success",
+          "databaseId": 105423899185,
+          "name": "consume (8)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:35Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:36Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:40Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:36Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:46Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:12Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:46Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:12Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:13Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:14Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:14Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:14Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423899185"
+        },
+        {
+          "completedAt": "2026-09-17T23:28:07Z",
+          "conclusion": "success",
+          "databaseId": 105423899355,
+          "name": "consume (21)",
+          "startedAt": "2026-09-17T23:27:32Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-09-17T23:27:34Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-09-17T23:27:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:35Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-09-17T23:27:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:39Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 3,
+              "startedAt": "2026-09-17T23:27:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-09-17T23:27:39Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run echo \"BUILD_JAVA_HOME=$JAVA_HOME\" >> \"$GITHUB_ENV\"",
+              "number": 5,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:44Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 6,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:27:45Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+              "number": 7,
+              "startedAt": "2026-09-17T23:27:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:05Z",
+              "conclusion": "success",
+              "name": "Verify and install signed candidate into a fresh Maven repository; consume without network or Python",
+              "number": 8,
+              "startedAt": "2026-09-17T23:27:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:05Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-09-17T23:28:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-09-17T23:28:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 16,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+              "number": 17,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-09-17T23:28:06Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-09-17T23:28:06Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752/job/105423899355"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/zerocloud-sdk/magika/actions/runs/35286463752"
+    }
+  },
+  "centralState": "PUBLISHED",
+  "deploymentId": "34e3277a-dd34-4e9c-8dd9-6bebc3932300",
+  "tag": "refs/tags/v0.1.0",
+  "githubRelease": "https://github.com/zerocloud-sdk/magika/releases/tag/v0.1.0",
+  "ledgerCommit": "01d053d6f184e339363a9ee4daf1741536c7fff1",
+  "candidate": {
+    "schema": 1,
+    "coordinate": "net.zerocloud:magika:0.1.0",
+    "version": "0.1.0",
+    "sourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+    "artifacts": {
+      "magika-0.1.0-javadoc.jar": {
+        "bytes": 172460,
+        "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+      },
+      "magika-0.1.0-sources.jar": {
+        "bytes": 45033,
+        "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+      },
+      "magika-0.1.0.jar": {
+        "bytes": 2978079,
+        "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+      },
+      "magika-0.1.0.pom": {
+        "bytes": 7063,
+        "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+      }
+    },
+    "model": "standard_v3_3",
+    "upstreamCommit": "9f225aa480e675af44343b9160f077073ed1b752",
+    "assets": [
+      {
+        "file": "model.onnx",
+        "bytes": 3163737,
+        "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/model.onnx"
+      },
+      {
+        "file": "config.min.json",
+        "bytes": 2141,
+        "sha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/models/standard_v3_3/config.min.json"
+      },
+      {
+        "file": "content_types_kb.min.json",
+        "bytes": 44768,
+        "sha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+        "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/assets/content_types_kb.min.json"
+      }
+    ],
+    "javaClassVersion": 52,
+    "classes": 27,
+    "contentSha256": "ba0b335229004f31c9ad6c9e3e68efdcf9f5e638fc6d51085ade8819a6d1a297",
+    "signingFingerprint": "C5149FD6B5EF7C2126F1FD0FCC1A12E348E171D8",
+    "signatures": {
+      "magika-0.1.0-javadoc.jar.asc": {
+        "bytes": 833,
+        "sha256": "068e5852a249f95361f37dce01416f09754f1917d880ac0a7eeec888c81313c4"
+      },
+      "magika-0.1.0-sources.jar.asc": {
+        "bytes": 833,
+        "sha256": "a90dff15951b2c0da3f2677be68d419b3a1fd35afe67b3e8f2847c7ffa537bf3"
+      },
+      "magika-0.1.0.jar.asc": {
+        "bytes": 833,
+        "sha256": "14952dbcbd88e758e9cc6e808f84519094b66a0ba2ddea682959e8d45d78ab62"
+      },
+      "magika-0.1.0.pom.asc": {
+        "bytes": 833,
+        "sha256": "deafdeb8d0621fe9da60e6cbc7742f46dc8861b12a4cd31179c28e58f01fdb97"
+      }
+    },
+    "bundleSha256": "b1140610d9aaf56b07a5a84f346988e99f9fbe648256f6cfe91497cd177b2821"
+  },
+  "matrix": [
+    {
+      "runtime": "8",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testCases": [
+        "net.zerocloud.magika.BatchTest.callbackFailureCountsOnlyNormalReturnsAndDoesNotRetrySideEffects",
+        "net.zerocloud.magika.BatchTest.defaultConfiguredAndImmutableBatchSizesBoundConsumption",
+        "net.zerocloud.magika.BatchTest.interruptionPreservesFlagAtInputAndDeliveryBoundaries",
+        "net.zerocloud.magika.BatchTest.actualFileFailuresContinueAndReleaseHandlesWithoutRetries",
+        "net.zerocloud.magika.BatchTest.systemFailureDuringSamplingAbortsInsteadOfBecomingAnInputItem",
+        "net.zerocloud.magika.BatchTest.twoModelRowsPreserveSingleRowNumericalAccuracy",
+        "net.zerocloud.magika.BatchTest.iteratorFaultsAndNullAbortWithKnownOrUnknownIndexAndDeliveredPrefix",
+        "net.zerocloud.magika.BatchTest.argumentsAndClosedStateRejectBeforeConsumption",
+        "net.zerocloud.magika.BatchTest.mixedBoundariesDuplicatesAndFailuresMatchSinglePathsInAllModes",
+        "net.zerocloud.magika.BatchTest.slowCallbacksHoldBackNextBatchOnTheCallingThread",
+        "net.zerocloud.magika.MagikaTest.minimumEightBytesAndInputOwnershipAreObservable",
+        "net.zerocloud.magika.MagikaTest.defaultsAndReusedBuilderKeepTheirOwnPredictionModes",
+        "net.zerocloud.magika.MagikaTest.runtimeIsTheSelectedJvmAndOfficialOrtReallyRuns",
+        "net.zerocloud.magika.MagikaTest.resultsAndProvenanceSurviveIdempotentSequentialClose",
+        "net.zerocloud.magika.MagikaTest.rulesUseStrictUtf8AndKeepUnknownAndEmptySuccessful",
+        "net.zerocloud.magika.MagikaTest.invalidArgumentsAreNotIdentificationResults",
+        "net.zerocloud.magika.ConcurrencyTest.failuresAndBatchInterruptsLeaveNoAdmissionBehindDuringClose",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsBothSinglesRejectsUntouchedInputsAndRestoresOwnerAndWaiterInterrupts",
+        "net.zerocloud.magika.ConcurrencyTest.sharedInstanceMatchesEverySequentialResultFieldInAllModes",
+        "net.zerocloud.magika.ConcurrencyTest.reentrantCloseFromReadsIteratorAndCallbackLeavesInstanceOpenEvenAfterNestedCalls",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsRemainingIteratorInputsAndTheFinalCallbackWithoutHoldingUserCodeLock",
+        "net.zerocloud.magika.ModelBoundaryTest.strippingNeverEscapes4096ByteWindows",
+        "net.zerocloud.magika.ModelBoundaryTest.onlyTheSixPythonByteWhitespaceValuesAreStripped",
+        "net.zerocloud.magika.ModelBoundaryTest.everyLabelHasBelowEqualAndAboveThresholdCoverageInHighAndMediumModes",
+        "net.zerocloud.magika.ModelBoundaryTest.actualModelFeaturesUse1024PerEndAndUnsignedBytes",
+        "net.zerocloud.magika.ModelBoundaryTest.lowScoresPreserveMappingFallbackReasonsAndOriginalScore",
+        "net.zerocloud.magika.PathReferenceTest.all207PathsMatchReferencesAndCompleteBytesInEveryMode",
+        "net.zerocloud.magika.PathTest.pathAndBytesShareFeaturesAndResultsAtContentBoundaries",
+        "net.zerocloud.magika.PathTest.nullClosedAndLinkedPathsFollowThePublicContract",
+        "net.zerocloud.magika.ReferenceTest.all141ContentsMatchThroughPublicApiInEveryMode",
+        "net.zerocloud.magika.ReferenceTest.all9261OfficialFeaturesMatchExactly",
+        "net.zerocloud.magika.StreamTest.customLimitsIncludeZeroExactAndOversizedInputs",
+        "net.zerocloud.magika.StreamTest.builderRejectsNegativeLimitsAndSnapshotsLongLimits",
+        "net.zerocloud.magika.StreamTest.consumesOnlyRemainingContentWithoutResetOrClose",
+        "net.zerocloud.magika.StreamTest.chunkingPreservesFeaturesAndEveryResultFieldAtContentBoundaries",
+        "net.zerocloud.magika.StreamTest.defaultLimitAcceptsExactly64MiBAndStopsAfterOneExtraByte",
+        "net.zerocloud.magika.StreamTest.nullAndClosedCallsFailBeforeReading",
+        "net.zerocloud.magika.StreamTest.readFailuresKeepTheirCauseAndCallerOwnershipIncludingAtTheLimit",
+        "net.zerocloud.magika.StreamTest.zeroLengthBulkReadsDoNotSpinOrLoseBytes",
+        "net.zerocloud.magika.PackagedIT.realSharedSessionAndNativeLifecycleFailures",
+        "net.zerocloud.magika.PackagedIT.configuredThreadCountsCreateNativeWorkersAndCloseReleasesThem",
+        "net.zerocloud.magika.PackagedIT.specialAndUnreadableFilesFailWithoutBlocking",
+        "net.zerocloud.magika.PackagedIT.corruptedMissingAndIncompatibleAssetsCannotInitialize",
+        "net.zerocloud.magika.PackagedIT.realBatchShapesNativeFailuresAndResourceRelease",
+        "net.zerocloud.magika.PackagedIT.runtimeDependenciesHaveJava8BaseBytecode",
+        "net.zerocloud.magika.PackagedIT.repeatedSequentialUseReleasesNativeResources",
+        "net.zerocloud.magika.PackagedIT.fileLargerThanHeapAndIntRangeUsesBoundedSampling",
+        "net.zerocloud.magika.PackagedIT.batchSuccessAndAbortPathsReleaseResources",
+        "net.zerocloud.magika.PackagedIT.millionLazyPathsFitInLimitedHeapWithoutRetainingResults",
+        "net.zerocloud.magika.PackagedIT.nativeLoaderFailuresHaveCategoryContextAndCause",
+        "net.zerocloud.magika.PackagedIT.distributionContainsAuthenticatedAssetsAndJava8Classes",
+        "net.zerocloud.magika.PackagedIT.singleFileHandleSurvivesReplacementAndClosesOnReadFailures",
+        "net.zerocloud.magika.PackagedIT.aValidOnnxModelWithTheWrongSignatureIsRejected",
+        "net.zerocloud.magika.PackagedIT.packagedPublicApiReallyRuns",
+        "net.zerocloud.magika.PackagedIT.largeByteArrayDoesNotNeedAnotherCompleteCopy",
+        "net.zerocloud.magika.PackagedIT.generatedStreamLargerThanHeapAndIntRangeUsesBoundedSampling"
+      ],
+      "javaRuntimeVersion": "1.8.0_504-b01",
+      "javaVendor": "Temurin",
+      "referenceMaxScoreErrors": [
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        7.748603820800781e-07
+      ]
+    },
+    {
+      "runtime": "17",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testCases": [
+        "net.zerocloud.magika.BatchTest.callbackFailureCountsOnlyNormalReturnsAndDoesNotRetrySideEffects",
+        "net.zerocloud.magika.BatchTest.defaultConfiguredAndImmutableBatchSizesBoundConsumption",
+        "net.zerocloud.magika.BatchTest.interruptionPreservesFlagAtInputAndDeliveryBoundaries",
+        "net.zerocloud.magika.BatchTest.actualFileFailuresContinueAndReleaseHandlesWithoutRetries",
+        "net.zerocloud.magika.BatchTest.systemFailureDuringSamplingAbortsInsteadOfBecomingAnInputItem",
+        "net.zerocloud.magika.BatchTest.twoModelRowsPreserveSingleRowNumericalAccuracy",
+        "net.zerocloud.magika.BatchTest.iteratorFaultsAndNullAbortWithKnownOrUnknownIndexAndDeliveredPrefix",
+        "net.zerocloud.magika.BatchTest.argumentsAndClosedStateRejectBeforeConsumption",
+        "net.zerocloud.magika.BatchTest.mixedBoundariesDuplicatesAndFailuresMatchSinglePathsInAllModes",
+        "net.zerocloud.magika.BatchTest.slowCallbacksHoldBackNextBatchOnTheCallingThread",
+        "net.zerocloud.magika.ConcurrencyTest.failuresAndBatchInterruptsLeaveNoAdmissionBehindDuringClose",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsBothSinglesRejectsUntouchedInputsAndRestoresOwnerAndWaiterInterrupts",
+        "net.zerocloud.magika.ConcurrencyTest.sharedInstanceMatchesEverySequentialResultFieldInAllModes",
+        "net.zerocloud.magika.ConcurrencyTest.reentrantCloseFromReadsIteratorAndCallbackLeavesInstanceOpenEvenAfterNestedCalls",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsRemainingIteratorInputsAndTheFinalCallbackWithoutHoldingUserCodeLock",
+        "net.zerocloud.magika.MagikaTest.minimumEightBytesAndInputOwnershipAreObservable",
+        "net.zerocloud.magika.MagikaTest.defaultsAndReusedBuilderKeepTheirOwnPredictionModes",
+        "net.zerocloud.magika.MagikaTest.runtimeIsTheSelectedJvmAndOfficialOrtReallyRuns",
+        "net.zerocloud.magika.MagikaTest.resultsAndProvenanceSurviveIdempotentSequentialClose",
+        "net.zerocloud.magika.MagikaTest.rulesUseStrictUtf8AndKeepUnknownAndEmptySuccessful",
+        "net.zerocloud.magika.MagikaTest.invalidArgumentsAreNotIdentificationResults",
+        "net.zerocloud.magika.ModelBoundaryTest.strippingNeverEscapes4096ByteWindows",
+        "net.zerocloud.magika.ModelBoundaryTest.onlyTheSixPythonByteWhitespaceValuesAreStripped",
+        "net.zerocloud.magika.ModelBoundaryTest.everyLabelHasBelowEqualAndAboveThresholdCoverageInHighAndMediumModes",
+        "net.zerocloud.magika.ModelBoundaryTest.actualModelFeaturesUse1024PerEndAndUnsignedBytes",
+        "net.zerocloud.magika.ModelBoundaryTest.lowScoresPreserveMappingFallbackReasonsAndOriginalScore",
+        "net.zerocloud.magika.PathReferenceTest.all207PathsMatchReferencesAndCompleteBytesInEveryMode",
+        "net.zerocloud.magika.PathTest.pathAndBytesShareFeaturesAndResultsAtContentBoundaries",
+        "net.zerocloud.magika.PathTest.nullClosedAndLinkedPathsFollowThePublicContract",
+        "net.zerocloud.magika.ReferenceTest.all141ContentsMatchThroughPublicApiInEveryMode",
+        "net.zerocloud.magika.ReferenceTest.all9261OfficialFeaturesMatchExactly",
+        "net.zerocloud.magika.StreamTest.customLimitsIncludeZeroExactAndOversizedInputs",
+        "net.zerocloud.magika.StreamTest.builderRejectsNegativeLimitsAndSnapshotsLongLimits",
+        "net.zerocloud.magika.StreamTest.consumesOnlyRemainingContentWithoutResetOrClose",
+        "net.zerocloud.magika.StreamTest.chunkingPreservesFeaturesAndEveryResultFieldAtContentBoundaries",
+        "net.zerocloud.magika.StreamTest.defaultLimitAcceptsExactly64MiBAndStopsAfterOneExtraByte",
+        "net.zerocloud.magika.StreamTest.nullAndClosedCallsFailBeforeReading",
+        "net.zerocloud.magika.StreamTest.readFailuresKeepTheirCauseAndCallerOwnershipIncludingAtTheLimit",
+        "net.zerocloud.magika.StreamTest.zeroLengthBulkReadsDoNotSpinOrLoseBytes",
+        "net.zerocloud.magika.PackagedIT.realSharedSessionAndNativeLifecycleFailures",
+        "net.zerocloud.magika.PackagedIT.configuredThreadCountsCreateNativeWorkersAndCloseReleasesThem",
+        "net.zerocloud.magika.PackagedIT.specialAndUnreadableFilesFailWithoutBlocking",
+        "net.zerocloud.magika.PackagedIT.corruptedMissingAndIncompatibleAssetsCannotInitialize",
+        "net.zerocloud.magika.PackagedIT.realBatchShapesNativeFailuresAndResourceRelease",
+        "net.zerocloud.magika.PackagedIT.runtimeDependenciesHaveJava8BaseBytecode",
+        "net.zerocloud.magika.PackagedIT.repeatedSequentialUseReleasesNativeResources",
+        "net.zerocloud.magika.PackagedIT.fileLargerThanHeapAndIntRangeUsesBoundedSampling",
+        "net.zerocloud.magika.PackagedIT.batchSuccessAndAbortPathsReleaseResources",
+        "net.zerocloud.magika.PackagedIT.millionLazyPathsFitInLimitedHeapWithoutRetainingResults",
+        "net.zerocloud.magika.PackagedIT.nativeLoaderFailuresHaveCategoryContextAndCause",
+        "net.zerocloud.magika.PackagedIT.distributionContainsAuthenticatedAssetsAndJava8Classes",
+        "net.zerocloud.magika.PackagedIT.singleFileHandleSurvivesReplacementAndClosesOnReadFailures",
+        "net.zerocloud.magika.PackagedIT.aValidOnnxModelWithTheWrongSignatureIsRejected",
+        "net.zerocloud.magika.PackagedIT.packagedPublicApiReallyRuns",
+        "net.zerocloud.magika.PackagedIT.largeByteArrayDoesNotNeedAnotherCompleteCopy",
+        "net.zerocloud.magika.PackagedIT.generatedStreamLargerThanHeapAndIntRangeUsesBoundedSampling"
+      ],
+      "javaRuntimeVersion": "17.0.20.1+1",
+      "javaVendor": "Eclipse Adoptium",
+      "referenceMaxScoreErrors": [
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        7.748603820800781e-07
+      ]
+    },
+    {
+      "runtime": "21",
+      "surefire": {
+        "tests": 39,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "testCases": [
+        "net.zerocloud.magika.BatchTest.callbackFailureCountsOnlyNormalReturnsAndDoesNotRetrySideEffects",
+        "net.zerocloud.magika.BatchTest.defaultConfiguredAndImmutableBatchSizesBoundConsumption",
+        "net.zerocloud.magika.BatchTest.interruptionPreservesFlagAtInputAndDeliveryBoundaries",
+        "net.zerocloud.magika.BatchTest.actualFileFailuresContinueAndReleaseHandlesWithoutRetries",
+        "net.zerocloud.magika.BatchTest.systemFailureDuringSamplingAbortsInsteadOfBecomingAnInputItem",
+        "net.zerocloud.magika.BatchTest.twoModelRowsPreserveSingleRowNumericalAccuracy",
+        "net.zerocloud.magika.BatchTest.iteratorFaultsAndNullAbortWithKnownOrUnknownIndexAndDeliveredPrefix",
+        "net.zerocloud.magika.BatchTest.argumentsAndClosedStateRejectBeforeConsumption",
+        "net.zerocloud.magika.BatchTest.mixedBoundariesDuplicatesAndFailuresMatchSinglePathsInAllModes",
+        "net.zerocloud.magika.BatchTest.slowCallbacksHoldBackNextBatchOnTheCallingThread",
+        "net.zerocloud.magika.MagikaTest.minimumEightBytesAndInputOwnershipAreObservable",
+        "net.zerocloud.magika.MagikaTest.defaultsAndReusedBuilderKeepTheirOwnPredictionModes",
+        "net.zerocloud.magika.MagikaTest.runtimeIsTheSelectedJvmAndOfficialOrtReallyRuns",
+        "net.zerocloud.magika.MagikaTest.resultsAndProvenanceSurviveIdempotentSequentialClose",
+        "net.zerocloud.magika.MagikaTest.rulesUseStrictUtf8AndKeepUnknownAndEmptySuccessful",
+        "net.zerocloud.magika.MagikaTest.invalidArgumentsAreNotIdentificationResults",
+        "net.zerocloud.magika.ConcurrencyTest.failuresAndBatchInterruptsLeaveNoAdmissionBehindDuringClose",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsBothSinglesRejectsUntouchedInputsAndRestoresOwnerAndWaiterInterrupts",
+        "net.zerocloud.magika.ConcurrencyTest.sharedInstanceMatchesEverySequentialResultFieldInAllModes",
+        "net.zerocloud.magika.ConcurrencyTest.reentrantCloseFromReadsIteratorAndCallbackLeavesInstanceOpenEvenAfterNestedCalls",
+        "net.zerocloud.magika.ConcurrencyTest.closeDrainsRemainingIteratorInputsAndTheFinalCallbackWithoutHoldingUserCodeLock",
+        "net.zerocloud.magika.ModelBoundaryTest.strippingNeverEscapes4096ByteWindows",
+        "net.zerocloud.magika.ModelBoundaryTest.onlyTheSixPythonByteWhitespaceValuesAreStripped",
+        "net.zerocloud.magika.ModelBoundaryTest.everyLabelHasBelowEqualAndAboveThresholdCoverageInHighAndMediumModes",
+        "net.zerocloud.magika.ModelBoundaryTest.actualModelFeaturesUse1024PerEndAndUnsignedBytes",
+        "net.zerocloud.magika.ModelBoundaryTest.lowScoresPreserveMappingFallbackReasonsAndOriginalScore",
+        "net.zerocloud.magika.PathReferenceTest.all207PathsMatchReferencesAndCompleteBytesInEveryMode",
+        "net.zerocloud.magika.PathTest.pathAndBytesShareFeaturesAndResultsAtContentBoundaries",
+        "net.zerocloud.magika.PathTest.nullClosedAndLinkedPathsFollowThePublicContract",
+        "net.zerocloud.magika.ReferenceTest.all141ContentsMatchThroughPublicApiInEveryMode",
+        "net.zerocloud.magika.ReferenceTest.all9261OfficialFeaturesMatchExactly",
+        "net.zerocloud.magika.StreamTest.customLimitsIncludeZeroExactAndOversizedInputs",
+        "net.zerocloud.magika.StreamTest.builderRejectsNegativeLimitsAndSnapshotsLongLimits",
+        "net.zerocloud.magika.StreamTest.consumesOnlyRemainingContentWithoutResetOrClose",
+        "net.zerocloud.magika.StreamTest.chunkingPreservesFeaturesAndEveryResultFieldAtContentBoundaries",
+        "net.zerocloud.magika.StreamTest.defaultLimitAcceptsExactly64MiBAndStopsAfterOneExtraByte",
+        "net.zerocloud.magika.StreamTest.nullAndClosedCallsFailBeforeReading",
+        "net.zerocloud.magika.StreamTest.readFailuresKeepTheirCauseAndCallerOwnershipIncludingAtTheLimit",
+        "net.zerocloud.magika.StreamTest.zeroLengthBulkReadsDoNotSpinOrLoseBytes",
+        "net.zerocloud.magika.PackagedIT.realSharedSessionAndNativeLifecycleFailures",
+        "net.zerocloud.magika.PackagedIT.configuredThreadCountsCreateNativeWorkersAndCloseReleasesThem",
+        "net.zerocloud.magika.PackagedIT.specialAndUnreadableFilesFailWithoutBlocking",
+        "net.zerocloud.magika.PackagedIT.corruptedMissingAndIncompatibleAssetsCannotInitialize",
+        "net.zerocloud.magika.PackagedIT.realBatchShapesNativeFailuresAndResourceRelease",
+        "net.zerocloud.magika.PackagedIT.runtimeDependenciesHaveJava8BaseBytecode",
+        "net.zerocloud.magika.PackagedIT.repeatedSequentialUseReleasesNativeResources",
+        "net.zerocloud.magika.PackagedIT.fileLargerThanHeapAndIntRangeUsesBoundedSampling",
+        "net.zerocloud.magika.PackagedIT.batchSuccessAndAbortPathsReleaseResources",
+        "net.zerocloud.magika.PackagedIT.millionLazyPathsFitInLimitedHeapWithoutRetainingResults",
+        "net.zerocloud.magika.PackagedIT.nativeLoaderFailuresHaveCategoryContextAndCause",
+        "net.zerocloud.magika.PackagedIT.distributionContainsAuthenticatedAssetsAndJava8Classes",
+        "net.zerocloud.magika.PackagedIT.singleFileHandleSurvivesReplacementAndClosesOnReadFailures",
+        "net.zerocloud.magika.PackagedIT.aValidOnnxModelWithTheWrongSignatureIsRejected",
+        "net.zerocloud.magika.PackagedIT.packagedPublicApiReallyRuns",
+        "net.zerocloud.magika.PackagedIT.largeByteArrayDoesNotNeedAnotherCompleteCopy",
+        "net.zerocloud.magika.PackagedIT.generatedStreamLargerThanHeapAndIntRangeUsesBoundedSampling"
+      ],
+      "javaRuntimeVersion": "21.0.12.1+1-LTS",
+      "javaVendor": "Eclipse Adoptium",
+      "referenceMaxScoreErrors": [
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        5.364418029785156e-07,
+        7.748603820800781e-07
+      ]
+    }
+  ],
+  "centralConsumers": [
+    {
+      "checkedAt": "2026-09-17T23:41:55.954Z",
+      "coordinate": "net.zerocloud:magika:0.1.0",
+      "sourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+      "sdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+      "candidateInstalled": false,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar",
+          "status": 200,
+          "bytes": 172460,
+          "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar",
+          "status": 200,
+          "bytes": 45033,
+          "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar",
+          "status": 200,
+          "bytes": 2978079,
+          "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom",
+          "status": 200,
+          "bytes": 7063,
+          "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "068e5852a249f95361f37dce01416f09754f1917d880ac0a7eeec888c81313c4"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "a90dff15951b2c0da3f2677be68d419b3a1fd35afe67b3e8f2847c7ffa537bf3"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "14952dbcbd88e758e9cc6e808f84519094b66a0ba2ddea682959e8d45d78ab62"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "deafdeb8d0621fe9da60e6cbc7742f46dc8861b12a4cd31179c28e58f01fdb97"
+        }
+      ],
+      "runtime": "openjdk version \"1.8.0_492\"\nOpenJDK Runtime Environment (build 1.8.0_492-8u492-ga~us2-0ubuntu1~24.04.1-b09)\nOpenJDK 64-Bit Server VM (build 25.492-b09, mixed mode)",
+      "dependencies": {
+        "magika-0.1.0.jar": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "onnxruntime-1.30.0.jar": "57d8cedf6f0c8fd6d50ed65c17bf9939f55a4512f4a1f3e732023d258f262ac6",
+        "gson-2.13.2.jar": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0",
+        "error_prone_annotations-2.41.0.jar": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc"
+      },
+      "javaOnlyOnlinePassed": true,
+      "offlineMavenPassed": true,
+      "javaOnlyOfflinePassed": true
+    },
+    {
+      "checkedAt": "2026-09-17T23:41:56.067Z",
+      "coordinate": "net.zerocloud:magika:0.1.0",
+      "sourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+      "sdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+      "candidateInstalled": false,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar",
+          "status": 200,
+          "bytes": 172460,
+          "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar",
+          "status": 200,
+          "bytes": 45033,
+          "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar",
+          "status": 200,
+          "bytes": 2978079,
+          "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom",
+          "status": 200,
+          "bytes": 7063,
+          "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "068e5852a249f95361f37dce01416f09754f1917d880ac0a7eeec888c81313c4"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "a90dff15951b2c0da3f2677be68d419b3a1fd35afe67b3e8f2847c7ffa537bf3"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "14952dbcbd88e758e9cc6e808f84519094b66a0ba2ddea682959e8d45d78ab62"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "deafdeb8d0621fe9da60e6cbc7742f46dc8861b12a4cd31179c28e58f01fdb97"
+        }
+      ],
+      "runtime": "openjdk version \"17.0.19\" 2026-04-21\nOpenJDK Runtime Environment (build 17.0.19+10-1-24.04.2-Ubuntu)\nOpenJDK 64-Bit Server VM (build 17.0.19+10-1-24.04.2-Ubuntu, mixed mode, sharing)",
+      "dependencies": {
+        "magika-0.1.0.jar": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "onnxruntime-1.30.0.jar": "57d8cedf6f0c8fd6d50ed65c17bf9939f55a4512f4a1f3e732023d258f262ac6",
+        "gson-2.13.2.jar": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0",
+        "error_prone_annotations-2.41.0.jar": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc"
+      },
+      "javaOnlyOnlinePassed": true,
+      "offlineMavenPassed": true,
+      "javaOnlyOfflinePassed": true
+    },
+    {
+      "checkedAt": "2026-09-17T23:41:56.018Z",
+      "coordinate": "net.zerocloud:magika:0.1.0",
+      "sourceSha": "c409ddf8fc8c3d53ce65ed73c2b06a18845f7366",
+      "sdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+      "candidateInstalled": false,
+      "downloads": [
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar",
+          "status": 200,
+          "bytes": 172460,
+          "sha256": "6b3469187bdb03e978b8e289ed44ddb8f0684c7f8eee6f769976fd6e5cf50470"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar",
+          "status": 200,
+          "bytes": 45033,
+          "sha256": "d5493ab816bba5eab4c7aa633c1d9afeff8c43618318915f1e507fc768dd2c1c"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar",
+          "status": 200,
+          "bytes": 2978079,
+          "sha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom",
+          "status": 200,
+          "bytes": 7063,
+          "sha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-javadoc.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "068e5852a249f95361f37dce01416f09754f1917d880ac0a7eeec888c81313c4"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0-sources.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "a90dff15951b2c0da3f2677be68d419b3a1fd35afe67b3e8f2847c7ffa537bf3"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.jar.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "14952dbcbd88e758e9cc6e808f84519094b66a0ba2ddea682959e8d45d78ab62"
+        },
+        {
+          "url": "https://repo.maven.apache.org/maven2/net/zerocloud/magika/0.1.0/magika-0.1.0.pom.asc",
+          "status": 200,
+          "bytes": 833,
+          "sha256": "deafdeb8d0621fe9da60e6cbc7742f46dc8861b12a4cd31179c28e58f01fdb97"
+        }
+      ],
+      "runtime": "openjdk version \"21.0.11\" 2026-04-21\nOpenJDK Runtime Environment (build 21.0.11+10-1-24.04.2-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.11+10-1-24.04.2-Ubuntu, mixed mode, sharing)",
+      "dependencies": {
+        "magika-0.1.0.jar": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+        "onnxruntime-1.30.0.jar": "57d8cedf6f0c8fd6d50ed65c17bf9939f55a4512f4a1f3e732023d258f262ac6",
+        "gson-2.13.2.jar": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0",
+        "error_prone_annotations-2.41.0.jar": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc"
+      },
+      "javaOnlyOnlinePassed": true,
+      "offlineMavenPassed": true,
+      "javaOnlyOfflinePassed": true
+    }
+  ],
+  "performanceEquivalence": {
+    "measuredCommit": "0d115930896a3c30d61a54418085420833c974fb",
+    "measuredSdkSha256": "0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3",
+    "releaseSdkSha256": "f1332489436cd33ce3daa50952090d6c0c3bf525d099a41fb208733c5350cd33",
+    "identicalClassCount": 27,
+    "changedJarEntries": [
+      {
+        "entry": "META-INF/maven/net.zerocloud/magika/pom.xml",
+        "measuredSha256": "6d8f4c55a77717351493596a66519a3b4674a2216dbbcb812ed8385775909dcf",
+        "releaseSha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b"
+      }
+    ],
+    "sources": [
+      {
+        "path": "benchmarks/pom.xml",
+        "measuredSha256": "156ddb3d57683d672214a77613996b8ec574d6791d56d0e592e97a3bf9e1934e",
+        "currentSha256": "156ddb3d57683d672214a77613996b8ec574d6791d56d0e592e97a3bf9e1934e",
+        "equal": true
+      },
+      {
+        "path": "benchmarks/run.sh",
+        "measuredSha256": "0a33a8c6452047fbd17a66bd5543df2e09df9fbec92363e7662ba2c4d36f6d53",
+        "currentSha256": "0a33a8c6452047fbd17a66bd5543df2e09df9fbec92363e7662ba2c4d36f6d53",
+        "equal": true
+      },
+      {
+        "path": "benchmarks/src/main/java/net/zerocloud/benchmarks/Corpus.java",
+        "measuredSha256": "75924d3cde3c33edf9a20c36f54171d0e2af36060f61d2708de181ca1947997a",
+        "currentSha256": "75924d3cde3c33edf9a20c36f54171d0e2af36060f61d2708de181ca1947997a",
+        "equal": true
+      },
+      {
+        "path": "benchmarks/src/main/java/net/zerocloud/benchmarks/IdentificationBenchmark.java",
+        "measuredSha256": "c1540e251f03a43f0d4cfcb1019b4493d6c01dbe7ebd1a4605ad1d2fd4914ef9",
+        "currentSha256": "c1540e251f03a43f0d4cfcb1019b4493d6c01dbe7ebd1a4605ad1d2fd4914ef9",
+        "equal": true
+      },
+      {
+        "path": "benchmarks/src/main/java/net/zerocloud/benchmarks/Measurements.java",
+        "measuredSha256": "d1316566b4313effa815039b5e3f8f80bda1bc9c046dd795341e513b1f7708c7",
+        "currentSha256": "d1316566b4313effa815039b5e3f8f80bda1bc9c046dd795341e513b1f7708c7",
+        "equal": true
+      },
+      {
+        "path": "benchmarks/src/main/java/net/zerocloud/benchmarks/ResourceMeasurement.java",
+        "measuredSha256": "f7977d1b711a7c86793f3224e6cc5f1928b11e4a120c980403f08d16a44636b2",
+        "currentSha256": "f7977d1b711a7c86793f3224e6cc5f1928b11e4a120c980403f08d16a44636b2",
+        "equal": true
+      },
+      {
+        "path": "pom.xml",
+        "measuredSha256": "6d8f4c55a77717351493596a66519a3b4674a2216dbbcb812ed8385775909dcf",
+        "currentSha256": "8bbb2fb0ad0b4a7a13a9d79374cc6def2d7e52d6c0b5427959cf3b7cdd0bfb7b",
+        "equal": false
+      },
+      {
+        "path": "src/main/filtered-resources/net/zerocloud/magika/sdk.properties",
+        "measuredSha256": "0110d6c5730c67632f7df522fc75607bed839bcc78575dc7134251464991507b",
+        "currentSha256": "0110d6c5730c67632f7df522fc75607bed839bcc78575dc7134251464991507b",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/BatchIdentification.java",
+        "measuredSha256": "2fd7f8dac8ee5f8ac075ee40c8e7f226500ecca56b501367bd6d798b2288e513",
+        "currentSha256": "2fd7f8dac8ee5f8ac075ee40c8e7f226500ecca56b501367bd6d798b2288e513",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/BatchIdentificationException.java",
+        "measuredSha256": "c47592663f749615bfa13d5835962d96e756ff81fefeb0baaaa34880e2718d43",
+        "currentSha256": "c47592663f749615bfa13d5835962d96e756ff81fefeb0baaaa34880e2718d43",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/BatchItemResult.java",
+        "measuredSha256": "bccc201fc285e65b4ead6a65b2c976af4cfea7f8abbb5d946c3734d3401a3cdb",
+        "currentSha256": "bccc201fc285e65b4ead6a65b2c976af4cfea7f8abbb5d946c3734d3401a3cdb",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/BatchModel.java",
+        "measuredSha256": "f03bf7aaf9756ee34e0c9c91aaa1a987ebacdba67be563016b022af81635d463",
+        "currentSha256": "f03bf7aaf9756ee34e0c9c91aaa1a987ebacdba67be563016b022af81635d463",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/BatchSummary.java",
+        "measuredSha256": "d1ad45888f074a41b9e4b1cc25ea392a9920b3fd4b0b3aa3fa350837ef25de99",
+        "currentSha256": "d1ad45888f074a41b9e4b1cc25ea392a9920b3fd4b0b3aa3fa350837ef25de99",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/DetectionResult.java",
+        "measuredSha256": "f9dcd166f7ea43b09357ff96ee50e27b9f206f8775a7803d963b163235a5ddf7",
+        "currentSha256": "f9dcd166f7ea43b09357ff96ee50e27b9f206f8775a7803d963b163235a5ddf7",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/Features.java",
+        "measuredSha256": "8aed9eb0449a81b753bfff8c5e73769760d6d13c9089543453ea025f15c74ee6",
+        "currentSha256": "8aed9eb0449a81b753bfff8c5e73769760d6d13c9089543453ea025f15c74ee6",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/InputSample.java",
+        "measuredSha256": "010f14c3375cbdad1d27fef30250ab4e5241737eee91aedc3350d25f792ed588",
+        "currentSha256": "010f14c3375cbdad1d27fef30250ab4e5241737eee91aedc3350d25f792ed588",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/Magika.java",
+        "measuredSha256": "3df1320cacd7fd1ce1fa2b4a2a719a0ea8fbac3b71e0b4cf0a5410364ca3e412",
+        "currentSha256": "3df1320cacd7fd1ce1fa2b4a2a719a0ea8fbac3b71e0b4cf0a5410364ca3e412",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/MagikaException.java",
+        "measuredSha256": "f8cde9d93132009519a508b5b63871773f1882176c277f7e0c6d60db36154a44",
+        "currentSha256": "f8cde9d93132009519a508b5b63871773f1882176c277f7e0c6d60db36154a44",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/ModelAdapter.java",
+        "measuredSha256": "43b38bda909b463947cdbdc2aae41603edca4e4254a97173e649cf1e9995998b",
+        "currentSha256": "43b38bda909b463947cdbdc2aae41603edca4e4254a97173e649cf1e9995998b",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/ModelAssets.java",
+        "measuredSha256": "a30a08d2a6cd76711c432b81ad224455598f647dbd16307ea55001bf3f37035c",
+        "currentSha256": "a30a08d2a6cd76711c432b81ad224455598f647dbd16307ea55001bf3f37035c",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/ModelInfo.java",
+        "measuredSha256": "00cdc59343fa902e17c53273f8980234db4770bc34ff83b16b81e30dc8856a51",
+        "currentSha256": "00cdc59343fa902e17c53273f8980234db4770bc34ff83b16b81e30dc8856a51",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/OverwriteReason.java",
+        "measuredSha256": "0be02a5721e87afefbad50fc031ba046ff7164c97b15f1fb55913095ca749d52",
+        "currentSha256": "0be02a5721e87afefbad50fc031ba046ff7164c97b15f1fb55913095ca749d52",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/PredictionMode.java",
+        "measuredSha256": "5000126ebfec01e4da79b67e1e663749d5c1e0f60acf47d3f7eff22ef3746584",
+        "currentSha256": "5000126ebfec01e4da79b67e1e663749d5c1e0f60acf47d3f7eff22ef3746584",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/RawPrediction.java",
+        "measuredSha256": "5fe5f3128c81eadb66d7b753e2542a82c20b08d1fdfc76b0248840cd58c61679",
+        "currentSha256": "5fe5f3128c81eadb66d7b753e2542a82c20b08d1fdfc76b0248840cd58c61679",
+        "equal": true
+      },
+      {
+        "path": "src/main/java/net/zerocloud/magika/package-info.java",
+        "measuredSha256": "536b9ad039e18b4cb6411737ae333d46ddfed24eaa80a8da7e857cd74c9b2e28",
+        "currentSha256": "423edd4d091191a00a986b2a30ec71353247100f24f57712026e3065cbdcdd3d",
+        "equal": false
+      },
+      {
+        "path": "src/main/resources/net/zerocloud/magika/model/asset-manifest.json",
+        "measuredSha256": "e8d6e6d18982a1a0f5046cf0cc8b0f2de349f2d9b0e44d7628f0ee588215e185",
+        "currentSha256": "e8d6e6d18982a1a0f5046cf0cc8b0f2de349f2d9b0e44d7628f0ee588215e185",
+        "equal": true
+      },
+      {
+        "path": "src/main/resources/net/zerocloud/magika/model/config.min.json",
+        "measuredSha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+        "currentSha256": "ae24c742205358f6ff6dfd5facb6743fb69743dbba8373e73da58ff0cbd695db",
+        "equal": true
+      },
+      {
+        "path": "src/main/resources/net/zerocloud/magika/model/content_types_kb.min.json",
+        "measuredSha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+        "currentSha256": "75208adba69bc0556403b62b32ef3ccf8b5ce494411780845852e52e6583a10d",
+        "equal": true
+      },
+      {
+        "path": "src/main/resources/net/zerocloud/magika/model/model.onnx",
+        "measuredSha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+        "currentSha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+        "equal": true
+      }
+    ],
+    "unchangedMeasurementArtifacts": [
+      {
+        "path": "benchmarks/target/identification-1.0.0.jar",
+        "sha256": "a6c68ebe82531f4a06dfeaa9748ccfa2f301ade6eba80341f88583caa2bf819e"
+      },
+      {
+        "path": "benchmarks/target/dependency/error_prone_annotations-2.41.0.jar",
+        "sha256": "a56e782b5b50811ac204073a355a21d915a2107fce13ec711331ad036f660fcc"
+      },
+      {
+        "path": "benchmarks/target/dependency/gson-2.13.2.jar",
+        "sha256": "dd0ce1b55a3ed2080cb70f9c655850cda86c206862310009dcb5e5c95265a5e0"
+      },
+      {
+        "path": "benchmarks/target/dependency/magika-0.1.0.jar",
+        "sha256": "0b6100573efff99e49b2c2288a820a72bcac25e9ce09d17c47cf4f029df27ca3"
+      },
+      {
+        "path": "benchmarks/target/dependency/onnxruntime-1.30.0.jar",
+        "sha256": "57d8cedf6f0c8fd6d50ed65c17bf9939f55a4512f4a1f3e732023d258f262ac6"
+      }
+    ],
+    "interpretation": "SDK class bytes, fixed assets and runtime dependencies match the measurement; only embedded POM differs. The performance values retain the original OpenJDK 21.0.11 host/method limits and are not new measurements on Temurin."
+  },
+  "releaseToolTests": {
+    "tests": 28,
+    "failures": 0,
+    "skipped": 0
+  },
+  "originalUntrackedFiles": {
+    "count": 24,
+    "unchanged": true,
+    "remainUntracked": true
+  },
+  "historicalLimitation": "Issue #6 descriptor assertion root cause remains unknown; subsequent passes are not a demonstrated fix.",
+  "officialSignaturesVerified": 4,
+  "credentialScan": {
+    "filesAndNestedZipEntriesScanned": 472,
+    "credentialMatches": 0,
+    "privateKeyBlocks": 0
+  },
+  "review": {
+    "standards": {
+      "remainingDocumentedBreaches": 0,
+      "remainingHeuristicFindings": 0,
+      "preparationHeuristicResolved": 1
+    },
+    "spec": {
+      "remainingFindings": 0
+    },
+    "scope": "Fixed BASE through release source plus the actual staged/unstaged/new evidence files; original untracked files excluded."
+  }
+}

@@ -154,6 +154,7 @@ workflow never overwrites a published coordinate or moves an existing tag.
 | Ambiguous upload, no deployment yet visible | Stop without another upload; inspect Portal and re-observe the same operation |
 | Known deployment ID needs reconciliation | Supply `recovery_deployment_id`; status name/coordinates must match, and validated/published bytes are checked before completion |
 | Validation/publishing takes too long, or observation has a network error | Retain ID and bundle; re-run polls that same deployment |
+| Central omits component PURLs while publishing | The strict identity check stops; keep observing the same deployment. After authenticated `PUBLISHED`, the coordinate-specific published flag and all eight exact public files are confirmed, rerun only the failed publish job to complete GitHub records from the ledger |
 | Central validation is `FAILED` | Retain diagnostics in Portal and terminal identity in the ledger; no automatic drop, replacement or re-upload |
 | Central is `PUBLISHED`, mirror incomplete | Wait for matching artifact and signature bytes; do not create GitHub records yet |
 | Central is published, GitHub tag/Release missing | Verify existing Central bytes, then finish only the missing GitHub operations |
@@ -167,6 +168,13 @@ ledger branch while retaining the candidate; this is a documented manual repair,
 not an automatic retry. Failed validation requiring different bytes requires a
 new candidate/version decision; the script never silently rewrites its identity.
 Do not delete the ledger, candidate or deployment while investigating failure.
+The [0.1.0 acceptance record](verification-issue-10.md) documents this exact
+recovery: Portal continued to omit PURLs after reporting `PUBLISHED`, but the
+known deployment ID/name, published coordinate flag, signed ledger and all eight
+public artifact/signature bytes proved identity. The failed job was resumed with
+`gh run rerun RUN_ID --repo zerocloud-sdk/magika --failed`, without another upload,
+signature or publish request. Do not repeatedly rerun while required external
+evidence is still incomplete.
 Central's [deployment retention](https://central.sonatype.org/faq/what-happened-to-my-deployments/)
 does not replace the durable release ledger.
 
