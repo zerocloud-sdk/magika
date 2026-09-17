@@ -63,10 +63,51 @@ public class MagikaTest {
     public void invalidArgumentsAreNotIdentificationResults() {
         assertThrows(IllegalArgumentException.class, () -> Magika.builder().intraOpThreads(0));
         assertThrows(IllegalArgumentException.class, () -> Magika.builder().intraOpThreads(-1));
+        IllegalArgumentException invalidMode = assertThrows(IllegalArgumentException.class,
+                () -> Magika.builder().predictionMode(null));
+        assertTrue(invalidMode.getMessage().contains("predictionMode"));
         try (Magika magika = Magika.create()) {
             assertThrows(IllegalArgumentException.class, () -> magika.identify(null));
             assertEquals("pdf", magika.identify(PDF).getLabel());
         }
+    }
+
+    @Test
+    public void defaultsAndReusedBuilderKeepTheirOwnPredictionModes() {
+        Magika.Builder builder = Magika.builder();
+        try (Magika created = Magika.create();
+             Magika defaultBuilt = builder.build();
+             Magika medium = builder.predictionMode(PredictionMode.MEDIUM_CONFIDENCE).build();
+             Magika best = builder.predictionMode(PredictionMode.BEST_GUESS).build();
+             Magika reused = builder.build()) {
+            builder.predictionMode(PredictionMode.HIGH_CONFIDENCE);
+            modeResults(created, "txt", "unknown");
+            modeResults(defaultBuilt, "txt", "unknown");
+            modeResults(medium, "handlebars", "unknown");
+            modeResults(best, "handlebars", "wasm");
+            modeResults(reused, "handlebars", "wasm");
+        }
+    }
+
+    private static void modeResults(Magika magika, String templateLabel, String binaryLabel) {
+        // Pinned content reference: the raw handlebars score is between 0.5 and 0.9.
+        byte[] template = ("0123456789abcdefghijklmnopqrstuvwxyzABername}}!\n"
+                + "  {{#each notifications}}\n    <p>{{this}}</p>\n"
+                + "  {{/eac0123456789abcdefghijklmnopqrstuvwxyzAB").getBytes(StandardCharsets.UTF_8);
+        DetectionResult text = magika.identify(template);
+        assertEquals(templateLabel, text.getLabel());
+        assertEquals("handlebars", text.getRawPrediction().get().getLabel());
+        assertEquals(0.8247618079185486, text.getScore(), 1e-5);
+        assertEquals(text.getScore(), text.getRawPrediction().get().getScore(), 0);
+        assertEquals("txt".equals(templateLabel) ? OverwriteReason.LOW_CONFIDENCE : OverwriteReason.NONE,
+                text.getOverwriteReason());
+        DetectionResult binary = magika.identify(new byte[] {0, 1, 2, 3, 4, 5, 6, 7});
+        assertEquals(binaryLabel, binary.getLabel());
+        assertEquals("wasm", binary.getRawPrediction().get().getLabel());
+        assertEquals(0.3142167329788208, binary.getScore(), 1e-5);
+        assertEquals(binary.getScore(), binary.getRawPrediction().get().getScore(), 0);
+        assertEquals("unknown".equals(binaryLabel) ? OverwriteReason.LOW_CONFIDENCE : OverwriteReason.NONE,
+                binary.getOverwriteReason());
     }
 
     @Test
@@ -78,25 +119,27 @@ public class MagikaTest {
                 {(byte) 0xe0, (byte) 0x80, (byte) 0x80}, {(byte) 0xed, (byte) 0xa0, (byte) 0x80},
                 {(byte) 0xf4, (byte) 0x90, (byte) 0x80, (byte) 0x80}, {(byte) 0xff},
                 {(byte) 0xf0, (byte) 0x9f, (byte) 0x92}, {(byte) 0xc2, 0x20}};
-        try (Magika magika = Magika.create()) {
-            rule(magika.identify(new byte[0]), "empty", "inode/x-empty");
-            for (byte[] input : valid) {
-                rule(magika.identify(input), "txt", "text/plain");
+        for (PredictionMode mode : PredictionMode.values()) {
+            try (Magika magika = Magika.builder().predictionMode(mode).build()) {
+                rule(magika.identify(new byte[0]), "empty", "inode/x-empty");
+                for (byte[] input : valid) {
+                    rule(magika.identify(input), "txt", "text/plain");
+                }
+                for (byte[] input : invalid) {
+                    rule(magika.identify(input), "unknown", "application/octet-stream");
+                }
+                byte[] whitespace = new byte[20000];
+                byte[] spaces = {9, 10, 11, 12, 13, 32};
+                for (int i = 0; i < whitespace.length; i++) {
+                    whitespace[i] = spaces[i % spaces.length];
+                }
+                rule(magika.identify(whitespace), "txt", "text/plain");
+                // Upstream decides from the first window when it lacks eight meaningful bytes.
+                whitespace[10000] = (byte) 0xff;
+                rule(magika.identify(whitespace), "txt", "text/plain");
+                whitespace[4095] = (byte) 0xc2;
+                rule(magika.identify(whitespace), "unknown", "application/octet-stream");
             }
-            for (byte[] input : invalid) {
-                rule(magika.identify(input), "unknown", "application/octet-stream");
-            }
-            byte[] whitespace = new byte[20000];
-            byte[] spaces = {9, 10, 11, 12, 13, 32};
-            for (int i = 0; i < whitespace.length; i++) {
-                whitespace[i] = spaces[i % spaces.length];
-            }
-            rule(magika.identify(whitespace), "txt", "text/plain");
-            // Upstream decides from the first window when it lacks eight meaningful bytes.
-            whitespace[10000] = (byte) 0xff;
-            rule(magika.identify(whitespace), "txt", "text/plain");
-            whitespace[4095] = (byte) 0xc2;
-            rule(magika.identify(whitespace), "unknown", "application/octet-stream");
         }
     }
 

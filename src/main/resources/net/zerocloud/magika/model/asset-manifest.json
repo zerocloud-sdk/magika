@@ -71,8 +71,12 @@
       "sha256": "3eda361e3d7290457bc859c02d491a5d94fcda3df75f1c53147adda57c0f756f",
       "source": "https://raw.githubusercontent.com/google/magika/9f225aa480e675af44343b9160f077073ed1b752/tests_data/reference/standard_v3_3-inference_examples_by_content.json.gz",
       "casesInFile": 141,
-      "casesInScope": 47,
-      "modeInScope": "high_confidence",
+      "casesInScope": 141,
+      "casesPerMode": {
+        "high_confidence": 47,
+        "medium_confidence": 47,
+        "best_guess": 47
+      },
       "inputs": "Complete original contents embedded as base64; no separate source files required"
     }
   ],

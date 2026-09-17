@@ -49,7 +49,9 @@ public final class DetectionResult {
     public Optional<RawPrediction> getRawPrediction() { return Optional.ofNullable(rawPrediction); }
 
     /**
-     * Explains label rewriting.
+     * Explains label rewriting under the selected {@link PredictionMode}.
+     * If the final label equals the raw label, the reason is {@code NONE},
+     * including when a low score still yields the same label.
      * @return the reason the raw label was changed, or {@code NONE}
      */
     public OverwriteReason getOverwriteReason() { return overwriteReason; }

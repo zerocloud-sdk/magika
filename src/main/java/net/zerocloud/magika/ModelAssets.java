@@ -35,7 +35,7 @@ final class ModelAssets {
     private final Map<String, ContentType> contentTypes = new HashMap<>();
     private final Map<String, Double> thresholds = new HashMap<>();
     private final Map<String, String> overwriteMap = new HashMap<>();
-    private final double defaultThreshold;
+    private final double mediumConfidenceThreshold;
 
     private ModelAssets() throws IOException {
         Map<String, String> digests = new LinkedHashMap<>();
@@ -77,8 +77,8 @@ final class ModelAssets {
         for (String label : new String[] {"empty", "txt", "unknown"}) {
             requireContentType(label);
         }
-        defaultThreshold = config.get("medium_confidence_threshold").getAsDouble();
-        require(validThreshold(defaultThreshold), "default confidence threshold");
+        mediumConfidenceThreshold = config.get("medium_confidence_threshold").getAsDouble();
+        require(validThreshold(mediumConfidenceThreshold), "medium confidence threshold");
         for (Map.Entry<String, JsonElement> entry : config.getAsJsonObject("thresholds").entrySet()) {
             double threshold = entry.getValue().getAsDouble();
             require(labels.contains(entry.getKey()) && validThreshold(threshold), "label threshold");
@@ -175,7 +175,10 @@ final class ModelAssets {
 
     String mappedLabel(String label) { return overwriteMap.getOrDefault(label, label); }
 
-    double threshold(String label) { return thresholds.getOrDefault(label, defaultThreshold); }
+    double threshold(String rawLabel, PredictionMode mode) {
+        return mode == PredictionMode.HIGH_CONFIDENCE
+                ? thresholds.getOrDefault(rawLabel, mediumConfidenceThreshold) : mediumConfidenceThreshold;
+    }
 
     static final class ContentType {
         final String mimeType;

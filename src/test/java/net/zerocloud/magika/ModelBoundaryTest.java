@@ -66,36 +66,67 @@ public class ModelBoundaryTest {
     }
 
     @Test
-    public void everyLabelHasBelowEqualAndAboveThresholdCoverage() throws Exception {
+    public void everyLabelHasBelowEqualAndAboveThresholdCoverageInHighAndMediumModes() throws Exception {
         ModelAssets assets = ModelAssets.load();
         JsonObject config = Fixtures.asset("config.min.json");
         JsonObject kb = Fixtures.asset("content_types_kb.min.json");
         JsonObject thresholds = config.getAsJsonObject("thresholds");
         JsonObject mappings = config.getAsJsonObject("overwrite_map");
-        int comparisons = 0;
-        for (JsonElement element : config.getAsJsonArray("target_labels_space")) {
-            String rawLabel = element.getAsString();
-            String mapped = mappings.has(rawLabel) ? mappings.get(rawLabel).getAsString() : rawLabel;
-            double threshold = thresholds.has(rawLabel) ? thresholds.get(rawLabel).getAsDouble()
-                    : config.get("medium_confidence_threshold").getAsDouble();
-            double[] scores = {Math.nextDown(threshold), threshold, Math.nextUp(threshold)};
-            for (int i = 0; i < scores.length; i++) {
-                String expectedLabel = i == 0
-                        ? (kb.getAsJsonObject(mapped).get("is_text").getAsBoolean() ? "txt" : "unknown")
-                        : mapped;
-                OverwriteReason expectedReason = rawLabel.equals(expectedLabel) ? OverwriteReason.NONE
-                        : (i == 0 ? OverwriteReason.LOW_CONFIDENCE : OverwriteReason.OVERWRITE_MAP);
-                DetectionResult result = ModelAdapter.resultForPrediction(assets, new RawPrediction(rawLabel, scores[i]));
-                assertEquals(rawLabel + " at score " + scores[i], expectedLabel, result.getLabel());
-                assertEquals(expectedReason, result.getOverwriteReason());
-                assertEquals(Fixtures.mime(kb, expectedLabel), result.getMimeType());
-                assertEquals(scores[i], result.getScore(), 0);
-                assertEquals(rawLabel, result.getRawPrediction().get().getLabel());
-                assertTrue(result.isModelUsed());
-                comparisons++;
+        for (PredictionMode mode : new PredictionMode[] {PredictionMode.HIGH_CONFIDENCE,
+                PredictionMode.MEDIUM_CONFIDENCE}) {
+            int comparisons = 0;
+            for (JsonElement element : config.getAsJsonArray("target_labels_space")) {
+                String rawLabel = element.getAsString();
+                String mapped = mappings.has(rawLabel) ? mappings.get(rawLabel).getAsString() : rawLabel;
+                double threshold = mode == PredictionMode.HIGH_CONFIDENCE && thresholds.has(rawLabel)
+                        ? thresholds.get(rawLabel).getAsDouble()
+                        : config.get("medium_confidence_threshold").getAsDouble();
+                double[] scores = {Math.nextDown(threshold), threshold, Math.nextUp(threshold)};
+                for (int i = 0; i < scores.length; i++) {
+                    String expectedLabel = i == 0
+                            ? (kb.getAsJsonObject(mapped).get("is_text").getAsBoolean() ? "txt" : "unknown")
+                            : mapped;
+                    OverwriteReason expectedReason = rawLabel.equals(expectedLabel) ? OverwriteReason.NONE
+                            : (i == 0 ? OverwriteReason.LOW_CONFIDENCE : OverwriteReason.OVERWRITE_MAP);
+                    prediction(assets, kb, mode, rawLabel, scores[i], expectedLabel, expectedReason);
+                    comparisons++;
+                }
             }
+            assertEquals(642, comparisons);
+            System.out.println(mode + " threshold comparisons: " + comparisons);
         }
-        assertEquals(642, comparisons);
+    }
+
+    @Test
+    public void lowScoresPreserveMappingFallbackReasonsAndOriginalScore() throws Exception {
+        ModelAssets assets = ModelAssets.load();
+        JsonObject kb = Fixtures.asset("content_types_kb.min.json");
+        for (PredictionMode mode : PredictionMode.values()) {
+            boolean bestGuess = mode == PredictionMode.BEST_GUESS;
+            OverwriteReason mapping = bestGuess ? OverwriteReason.OVERWRITE_MAP : OverwriteReason.LOW_CONFIDENCE;
+            OverwriteReason fallback = bestGuess ? OverwriteReason.NONE : OverwriteReason.LOW_CONFIDENCE;
+            // Both mappings must survive even a score of zero in BEST_GUESS.
+            prediction(assets, kb, mode, "randomtxt", 0, "txt", mapping);
+            prediction(assets, kb, mode, "randombytes", 0, "unknown", mapping);
+            prediction(assets, kb, mode, "html", 0, bestGuess ? "html" : "txt", fallback);
+            prediction(assets, kb, mode, "pdf", 0, bestGuess ? "pdf" : "unknown", fallback);
+            // A fallback to the original label is not an overwrite.
+            prediction(assets, kb, mode, "txt", 0, "txt", OverwriteReason.NONE);
+        }
+    }
+
+    private static void prediction(ModelAssets assets, JsonObject kb, PredictionMode mode,
+                                   String rawLabel, double score, String label, OverwriteReason reason) {
+        DetectionResult result = ModelAdapter.resultForPrediction(assets, new RawPrediction(rawLabel, score), mode);
+        String message = mode + " " + rawLabel + " at score " + score;
+        assertEquals(message, label, result.getLabel());
+        assertEquals(message, reason, result.getOverwriteReason());
+        assertEquals(message, Fixtures.mime(kb, label), result.getMimeType());
+        assertEquals(message, score, result.getScore(), 0);
+        assertEquals(message, rawLabel, result.getRawPrediction().get().getLabel());
+        assertEquals(message, score, result.getRawPrediction().get().getScore(), 0);
+        assertTrue(message, result.isModelUsed());
+        assertEquals("standard_v3_3", result.getModelVersion());
     }
 
     private static int[] extract(byte[] content) {

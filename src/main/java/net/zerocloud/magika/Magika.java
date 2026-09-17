@@ -3,7 +3,8 @@ package net.zerocloud.magika;
 
 /**
  * Offline byte array identification using the bundled standard_v3_3 model and
- * HIGH_CONFIDENCE rules. Creating an instance eagerly validates assets and loads
+ * a configurable {@link PredictionMode}, defaulting to HIGH_CONFIDENCE.
+ * Creating an instance eagerly validates assets and loads
  * a CPU ONNX Runtime session. Reuse instances for sequential calls.
  * Creation disables telemetry on the JVM-shared ORT environment, as upstream does.
  *
@@ -14,8 +15,8 @@ public final class Magika implements AutoCloseable {
     private final ModelAdapter adapter;
     private boolean closed;
 
-    private Magika(int intraOpThreads) {
-        adapter = ModelAdapter.create(intraOpThreads);
+    private Magika(int intraOpThreads, PredictionMode predictionMode) {
+        adapter = ModelAdapter.create(intraOpThreads, predictionMode);
     }
 
     /**
@@ -75,8 +76,25 @@ public final class Magika implements AutoCloseable {
     /** Mutable configuration builder; not thread-safe. */
     public static final class Builder {
         private int intraOpThreads = 1;
+        private PredictionMode predictionMode = PredictionMode.HIGH_CONFIDENCE;
 
         private Builder() { }
+
+        /**
+         * Selects the official confidence policy. All modes apply type mapping;
+         * HIGH_CONFIDENCE and MEDIUM_CONFIDENCE also reject scores strictly below
+         * their configured threshold. BEST_GUESS skips low-score rejection.
+         * @param mode the prediction mode; the default is HIGH_CONFIDENCE
+         * @return this builder
+         * @throws IllegalArgumentException if mode is null
+         */
+        public Builder predictionMode(PredictionMode mode) {
+            if (mode == null) {
+                throw new IllegalArgumentException("predictionMode must not be null");
+            }
+            predictionMode = mode;
+            return this;
+        }
 
         /**
          * Sets ONNX Runtime's intra-operation thread count. Graph execution remains sequential.
@@ -98,6 +116,6 @@ public final class Magika implements AutoCloseable {
          * @return a fully initialized instance owned by the caller
          * @throws MagikaException if validation or initialization fails
          */
-        public Magika build() { return new Magika(intraOpThreads); }
+        public Magika build() { return new Magika(intraOpThreads, predictionMode); }
     }
 }

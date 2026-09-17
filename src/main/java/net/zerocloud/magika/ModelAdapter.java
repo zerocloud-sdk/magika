@@ -23,19 +23,21 @@ import java.util.Map;
 /** Owns native instance resources and the fixed model's inference contract. */
 final class ModelAdapter implements AutoCloseable {
     private final ModelAssets assets;
+    private final PredictionMode predictionMode;
     private final OrtEnvironment environment;
     private final OrtSession session;
     private final OrtSession.SessionOptions options;
 
     private ModelAdapter(ModelAssets assets, OrtEnvironment environment, OrtSession session,
-                         OrtSession.SessionOptions options) {
+                         OrtSession.SessionOptions options, PredictionMode predictionMode) {
         this.assets = assets;
+        this.predictionMode = predictionMode;
         this.environment = environment;
         this.session = session;
         this.options = options;
     }
 
-    static ModelAdapter create(int threads) {
+    static ModelAdapter create(int threads, PredictionMode predictionMode) {
         ModelAssets assets = ModelAssets.load();
         OrtSession.SessionOptions options = null;
         OrtSession session = null;
@@ -51,7 +53,7 @@ final class ModelAdapter implements AutoCloseable {
                     ModelAssets.HEAD_SIZE + ModelAssets.TAIL_SIZE);
             validateTensor(session.getOutputInfo(), "target_label", OnnxJavaType.FLOAT,
                     ModelAssets.LABEL_COUNT);
-            return new ModelAdapter(assets, environment, session, options);
+            return new ModelAdapter(assets, environment, session, options, predictionMode);
         } catch (OrtException | RuntimeException | LinkageError failure) {
             MagikaException error = new MagikaException(MagikaException.Category.MODEL_INITIALIZATION,
                     ModelAssets.MODEL_VERSION, "Cannot initialize ONNX Runtime model session", failure);
@@ -108,7 +110,7 @@ final class ModelAdapter implements AutoCloseable {
                     top = i;
                 }
             }
-            return resultForPrediction(assets, new RawPrediction(assets.labels.get(top), scores[top]));
+            return resultForPrediction(assets, new RawPrediction(assets.labels.get(top), scores[top]), predictionMode);
         } catch (OrtException | RuntimeException | LinkageError failure) {
             throw new MagikaException(MagikaException.Category.INFERENCE,
                     ModelAssets.MODEL_VERSION + ", byteLength=" + content.length,
@@ -117,11 +119,11 @@ final class ModelAdapter implements AutoCloseable {
     }
 
     // Restricted adapter contract for deterministic threshold boundary tests.
-    static DetectionResult resultForPrediction(ModelAssets assets, RawPrediction raw) {
+    static DetectionResult resultForPrediction(ModelAssets assets, RawPrediction raw, PredictionMode mode) {
         String label = assets.mappedLabel(raw.getLabel());
         OverwriteReason reason = label.equals(raw.getLabel())
                 ? OverwriteReason.NONE : OverwriteReason.OVERWRITE_MAP;
-        if (raw.getScore() < assets.threshold(raw.getLabel())) {
+        if (mode != PredictionMode.BEST_GUESS && raw.getScore() < assets.threshold(raw.getLabel(), mode)) {
             label = assets.contentType(label).text ? "txt" : "unknown";
             reason = label.equals(raw.getLabel()) ? OverwriteReason.NONE : OverwriteReason.LOW_CONFIDENCE;
         }

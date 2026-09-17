@@ -7,7 +7,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import java.util.Base64;
+import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -54,25 +56,35 @@ public class ReferenceTest {
     }
 
     @Test
-    public void all47HighConfidenceContentsMatchThroughPublicApi() throws Exception {
+    public void all141ContentsMatchThroughPublicApiInEveryMode() throws Exception {
         JsonObject kb = Fixtures.asset("content_types_kb.min.json");
         int count = 0;
-        int modelUsed = 0;
+        Map<PredictionMode, Integer> counts = new EnumMap<>(PredictionMode.class);
+        Map<PredictionMode, Integer> modelUses = new EnumMap<>(PredictionMode.class);
+        for (PredictionMode mode : PredictionMode.values()) {
+            counts.put(mode, 0);
+            modelUses.put(mode, 0);
+        }
         double maxError = 0;
-        try (Magika magika = Magika.create();
+        try (Magika high = Magika.builder().predictionMode(PredictionMode.HIGH_CONFIDENCE).build();
+             Magika medium = Magika.builder().predictionMode(PredictionMode.MEDIUM_CONFIDENCE).build();
+             Magika best = Magika.builder().predictionMode(PredictionMode.BEST_GUESS).build();
              JsonReader reader = Fixtures.reference("standard_v3_3-inference_examples_by_content.json.gz",
                      "3eda361e3d7290457bc859c02d491a5d94fcda3df75f1c53147adda57c0f756f")) {
+            Map<PredictionMode, Magika> instances = new EnumMap<>(PredictionMode.class);
+            instances.put(PredictionMode.HIGH_CONFIDENCE, high);
+            instances.put(PredictionMode.MEDIUM_CONFIDENCE, medium);
+            instances.put(PredictionMode.BEST_GUESS, best);
             reader.beginArray();
             while (reader.hasNext()) {
                 JsonObject example = JsonParser.parseReader(reader).getAsJsonObject();
-                if (!"high_confidence".equals(example.get("prediction_mode").getAsString())) {
-                    continue;
-                }
+                PredictionMode mode = PredictionMode.valueOf(example.get("prediction_mode").getAsString()
+                        .toUpperCase(Locale.ROOT));
                 assertEquals("ok", example.get("status").getAsString());
                 JsonObject expected = example.getAsJsonObject("prediction");
                 byte[] content = Base64.getDecoder().decode(example.get("content_base64").getAsString());
-                DetectionResult actual = magika.identify(content);
-                String message = "Content reference #" + count;
+                DetectionResult actual = instances.get(mode).identify(content);
+                String message = mode + " content reference #" + count;
                 assertEquals(message, expected.get("output").getAsString(), actual.getLabel());
                 assertEquals(message, Fixtures.mime(kb, actual.getLabel()), actual.getMimeType());
                 assertEquals(message, OverwriteReason.valueOf(expected.get("overwrite_reason").getAsString()
@@ -85,20 +97,26 @@ public class ReferenceTest {
                     assertFalse(message, actual.getRawPrediction().isPresent());
                     assertFalse(message, actual.isModelUsed());
                     assertEquals(1.0, actual.getScore(), 0);
+                    assertEquals(OverwriteReason.NONE, actual.getOverwriteReason());
                 } else {
                     assertTrue(message, actual.isModelUsed());
                     RawPrediction raw = actual.getRawPrediction().get();
                     assertEquals(message, dl, raw.getLabel());
                     assertEquals(actual.getScore(), raw.getScore(), 0);
-                    modelUsed++;
+                    modelUses.put(mode, modelUses.get(mode) + 1);
                 }
+                counts.put(mode, counts.get(mode) + 1);
                 count++;
             }
             reader.endArray();
+            assertFalse(reader.hasNext());
         }
-        assertEquals(47, count);
-        assertTrue(modelUsed > 0);
-        System.out.println("HIGH_CONFIDENCE references: " + count + ", modelUsed=" + modelUsed
-                + ", max absolute score error=" + maxError);
+        assertEquals(141, count);
+        for (PredictionMode mode : PredictionMode.values()) {
+            assertEquals(mode + " references", 47, (int) counts.get(mode));
+            assertEquals(mode + " model inferences", 43, (int) modelUses.get(mode));
+            System.out.println(mode + " references: " + counts.get(mode) + ", modelUsed=" + modelUses.get(mode));
+        }
+        System.out.println("All content references: " + count + ", max absolute score error=" + maxError);
     }
 }
