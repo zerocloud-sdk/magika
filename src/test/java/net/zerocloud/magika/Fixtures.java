@@ -118,16 +118,24 @@ final class Fixtures {
     }
 
     static void assertEquivalent(String message, DetectionResult expected, DetectionResult actual) {
+        assertEquivalent(message, expected, actual, 0);
+    }
+
+    static void assertBatchEquivalent(String message, DetectionResult expected, DetectionResult actual) {
+        assertEquivalent(message, expected, actual, 1e-5);
+    }
+
+    private static void assertEquivalent(String message, DetectionResult expected, DetectionResult actual, double tolerance) {
         assertEquals(message, expected.getLabel(), actual.getLabel());
         assertEquals(message, expected.getMimeType(), actual.getMimeType());
-        assertEquals(message, expected.getScore(), actual.getScore(), 0);
+        assertEquals(message, expected.getScore(), actual.getScore(), tolerance);
         assertEquals(message, expected.getOverwriteReason(), actual.getOverwriteReason());
         assertEquals(message, expected.isModelUsed(), actual.isModelUsed());
         assertEquals(message, expected.getModelVersion(), actual.getModelVersion());
         assertEquals(message, expected.getRawPrediction().isPresent(), actual.getRawPrediction().isPresent());
         if (expected.getRawPrediction().isPresent()) {
             assertEquals(message, expected.getRawPrediction().get().getLabel(), actual.getRawPrediction().get().getLabel());
-            assertEquals(message, expected.getRawPrediction().get().getScore(), actual.getRawPrediction().get().getScore(), 0);
+            assertEquals(message, expected.getRawPrediction().get().getScore(), actual.getRawPrediction().get().getScore(), tolerance);
         }
     }
 }

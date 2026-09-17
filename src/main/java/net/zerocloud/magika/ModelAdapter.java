@@ -16,11 +16,16 @@ import java.nio.IntBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /** Owns native instance resources and the fixed model's inference contract. */
 final class ModelAdapter implements AutoCloseable {
+    private static final int INPUT_WIDTH = ModelAssets.HEAD_SIZE + ModelAssets.TAIL_SIZE;
+    // ORT copies heap IntBuffers into a direct ByteBuffer with an int byte capacity.
+    static final int MAX_BATCH_SIZE = Integer.MAX_VALUE / Integer.BYTES / INPUT_WIDTH;
     private final ModelAssets assets;
     private final PredictionMode predictionMode;
     private final OrtEnvironment environment;
@@ -47,7 +52,9 @@ final class ModelAdapter implements AutoCloseable {
             options = new OrtSession.SessionOptions();
             options.setExecutionMode(OrtSession.SessionOptions.ExecutionMode.SEQUENTIAL);
             options.setIntraOpNumThreads(threads);
-            session = environment.createSession(assets.model, options);
+            // The transpose optimizer would undo the equivalent stable reduction layout.
+            options.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.NO_OPT);
+            session = environment.createSession(BatchModel.withStableReductions(assets.model), options);
             validateTensor(session.getInputInfo(), "bytes", OnnxJavaType.INT32,
                     ModelAssets.HEAD_SIZE + ModelAssets.TAIL_SIZE);
             validateTensor(session.getOutputInfo(), "target_label", OnnxJavaType.FLOAT,
@@ -81,38 +88,75 @@ final class ModelAdapter implements AutoCloseable {
     ModelInfo modelInfo() { return assets.info; }
 
     DetectionResult identify(InputSample sample) {
+        Prepared prepared = prepare(sample);
+        return prepared.result != null ? prepared.result
+                : infer(Collections.singletonList(prepared.features)).get(0);
+    }
+
+    /** Prepares a rule result or model features without retaining the sample. */
+    Prepared prepare(InputSample sample) {
         if (sample.length == 0) {
-            return ruleResult("empty");
+            return new Prepared(ruleResult("empty"), null);
         }
         if (sample.length < ModelAssets.MIN_MODEL_BYTES) {
-            return fewBytes(sample);
+            return new Prepared(fewBytes(sample), null);
         }
         int[] features = Features.extract(sample, ModelAssets.HEAD_SIZE, ModelAssets.TAIL_SIZE, ModelAssets.PADDING);
         if (features[ModelAssets.MIN_MODEL_BYTES - 1] == ModelAssets.PADDING) {
-            return fewBytes(sample);
+            return new Prepared(fewBytes(sample), null);
         }
-        try (OnnxTensor input = OnnxTensor.createTensor(environment, IntBuffer.wrap(features),
-                     new long[] {1, features.length});
-             OrtSession.Result output = session.run(Collections.singletonMap("bytes", input))) {
-            float[][] rows = (float[][]) output.get(0).getValue();
-            if (rows.length != 1 || rows[0].length != ModelAssets.LABEL_COUNT) {
-                throw new IllegalStateException("Unexpected inference output shape");
-            }
-            float[] scores = rows[0];
-            int top = 0;
-            for (int i = 0; i < scores.length; i++) {
-                if (Float.isNaN(scores[i]) || scores[i] < 0 || scores[i] > 1) {
-                    throw new IllegalStateException("Invalid model score at index " + i);
+        return new Prepared(null, features);
+    }
+
+    /** Runs exactly the supplied model rows in one native call; no rule-only rows. */
+    List<DetectionResult> infer(List<int[]> features) {
+        try {
+            int elements = Math.multiplyExact(features.size(), INPUT_WIDTH);
+            Math.multiplyExact(elements, Integer.BYTES);
+            IntBuffer buffer = IntBuffer.allocate(elements);
+            for (int[] row : features) { buffer.put(row); }
+            buffer.flip();
+            try (OnnxTensor input = OnnxTensor.createTensor(environment, buffer,
+                         new long[] {features.size(), INPUT_WIDTH});
+                 OrtSession.Result output = session.run(Collections.singletonMap("bytes", input))) {
+                float[][] rows = (float[][]) output.get(0).getValue();
+                if (rows.length != features.size()) {
+                    throw new IllegalStateException("Unexpected inference batch dimension");
                 }
-                if (scores[i] > scores[top]) {
-                    top = i;
+                List<DetectionResult> results = new ArrayList<>(rows.length);
+                for (float[] scores : rows) {
+                    results.add(resultForScores(scores));
                 }
+                return results;
             }
-            return resultForPrediction(assets, new RawPrediction(assets.labels.get(top), scores[top]), predictionMode);
         } catch (OrtException | RuntimeException | LinkageError failure) {
             throw new MagikaException(MagikaException.Category.INFERENCE,
-                    ModelAssets.MODEL_VERSION + ", byteLength=" + sample.length,
+                    ModelAssets.MODEL_VERSION + ", modelRows=" + features.size(),
                     "Cannot execute model inference", failure);
+        }
+    }
+
+    private DetectionResult resultForScores(float[] scores) {
+        if (scores.length != ModelAssets.LABEL_COUNT) {
+            throw new IllegalStateException("Unexpected inference output width");
+        }
+        int top = 0;
+        for (int i = 0; i < scores.length; i++) {
+            if (Float.isNaN(scores[i]) || scores[i] < 0 || scores[i] > 1) {
+                throw new IllegalStateException("Invalid model score at index " + i);
+            }
+            if (scores[i] > scores[top]) { top = i; }
+        }
+        return resultForPrediction(assets, new RawPrediction(assets.labels.get(top), scores[top]), predictionMode);
+    }
+
+    static final class Prepared {
+        final DetectionResult result;
+        final int[] features;
+
+        private Prepared(DetectionResult result, int[] features) {
+            this.result = result;
+            this.features = features;
         }
     }
 

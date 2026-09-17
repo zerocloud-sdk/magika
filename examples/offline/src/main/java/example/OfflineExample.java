@@ -42,6 +42,7 @@ public final class OfflineExample {
         System.out.println(result.getLabel() + " " + result.getMimeType() + " score=" + result.getScore());
         SavedUploadExample.main(new String[0]);
         StreamUploadExample.main(new String[0]);
+        BatchExample.main(new String[0]);
 
         byte[] ambiguousContent = {0, 1, 2, 3, 4, 5, 6, 7};
         for (PredictionMode mode : PredictionMode.values()) {

@@ -1,4 +1,4 @@
-name: Verify offline byte-array and file SDK
+name: Verify offline single-input and batch SDK
 on:
   push:
   pull_request:

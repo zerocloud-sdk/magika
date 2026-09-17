@@ -1,15 +1,16 @@
 # Magika Java SDK
 
 An independently maintained Java 8 SDK by ZeroCloud SDK. It identifies complete
-byte arrays, saved regular files and streams offline using Google's bundled `standard_v3_3` Magika model and the
+byte arrays, saved regular files, streams and lazy batches of paths offline using Google's bundled `standard_v3_3` Magika model and the
 official ONNX Runtime CPU dependency, version `1.30.0`.
 
 This implements [issue #2](https://github.com/zerocloud-sdk/magika/issues/2),
 [issue #3](https://github.com/zerocloud-sdk/magika/issues/3),
-[issue #4](https://github.com/zerocloud-sdk/magika/issues/4) and
-[issue #5](https://github.com/zerocloud-sdk/magika/issues/5): sequential byte array, file and stream
+[issue #4](https://github.com/zerocloud-sdk/magika/issues/4),
+[issue #5](https://github.com/zerocloud-sdk/magika/issues/5) and
+[issue #6](https://github.com/zerocloud-sdk/magika/issues/6): sequential byte array, file, stream and batch
 identification with all three official prediction modes, defaulting to
-**HIGH_CONFIDENCE**. Batch APIs, concurrent use and release
+**HIGH_CONFIDENCE**. Concurrent use and release
 publication are separate tickets. Version `0.1.0` here is a local build, not a claim
 that a release has been published to Maven Central.
 
@@ -59,7 +60,7 @@ Like the fixed upstream implementation, creation disables telemetry on the
 JVM-shared ORT environment; this setting also affects other users of that environment.
 
 Reuse an instance for sequential calls. The caller must serialize calls to
-`identify` and `close` in this version. Close the instance with try-with-resources;
+`identify`, the entire `identifyAll` call and `close` in this version. Close the instance with try-with-resources;
 closing releases the Session before SessionOptions and leaves the JVM-shared
 OrtEnvironment alone. Repeated sequential close is harmless. Identification after
 close throws `IllegalStateException`. `getModelInfo()` remains usable after close.
@@ -151,6 +152,90 @@ consumes an application envelope first, identifies the remaining upload, and
 closes the stream in the application's resource block. The isolated consumer
 below compiles and runs it against the installed SDK.
 
+## Ordered lazy batches
+
+`identifyAll(Iterator<Path>, Consumer<BatchItemResult>)` runs synchronously on the
+calling thread and returns `BatchSummary`. For example, the application can own
+a lazy directory traversal and its stream lifetime:
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+import net.zerocloud.magika.BatchIdentificationException;
+import net.zerocloud.magika.BatchSummary;
+import net.zerocloud.magika.Magika;
+
+try (Stream<Path> paths = Files.walk(Paths.get("uploads"));
+     Magika magika = Magika.builder().batchSize(32).build()) {
+    try {
+        BatchSummary summary = magika.identifyAll(paths.iterator(), item -> {
+            if (item.isSuccess()) {
+                System.out.println(item.getInputIndex() + ": " + item.getResult().get().getLabel());
+            } else {
+                System.err.println(item.getPath() + ": " + item.getError().get().getMessage());
+            }
+        });
+        System.out.println("Delivered " + summary.getDeliveredCount() + ", successful "
+                + summary.getSuccessCount() + ", file failures " + summary.getFailureCount());
+    } catch (BatchIdentificationException error) {
+        System.err.println("Aborted at " + error.getStage() + ", delivered "
+                + error.getDeliveredCount() + ", input index " + error.getInputIndex());
+        // Reconcile callback side effects and consumed input before choosing recovery.
+    }
+}
+```
+
+The [runnable batch example](examples/offline/src/main/java/example/BatchExample.java)
+demonstrates successes, a missing file, duplicate paths and a throwing callback
+with exact delivery progress. It also runs in the independent offline consumer.
+Directories produced by the traversal above are delivered as per-file failures;
+the application may instead filter them when planning its input sequence.
+
+- `batchSize` defaults to **32**, including both `create()` and a default builder.
+  It must be positive and at most **262143**, so INT32 tensor element counts and
+  direct-buffer byte capacities fit an `int`. Excessive settings fail with
+  `IllegalArgumentException`; a large valid setting allocates only for actual inputs.
+  Each built instance keeps its configuration after later builder changes.
+- Each batch consumes at most that many input positions, packs only model inputs
+  into one real ORT tensor, then delivers all outcomes in original order. Repeated
+  paths retain separate zero-based `long` indices and the original `Path` objects.
+  Exactly one of `getResult()` and `getError()` is present. Empty and unknown
+  detections count as successes; unreadable/non-regular files and read/close errors
+  have category `INPUT` and processing continues.
+- No input/result history or SDK worker pool is created. Slow callbacks prevent
+  the next batch from being consumed. SDK working storage grows with the current
+  batch, excluding model/ORT allocations and values retained by the application.
+- Null iterator/consumer arguments are illegal arguments. A null iterator element,
+  iterator failure, system/inference failure or throwing callback aborts the call
+  as `BatchIdentificationException` (category `BATCH`), with the cause chain intact.
+  `getStage()` distinguishes `ITERATION`, `IDENTIFICATION`, `CALLBACK` and
+  `INTERRUPTED`. `getInputIndex()` is absent for a failed `hasNext` or a model failure
+  involving several rows; it identifies `next`, null-element, sampling or callback
+  failures, and model failures with exactly one model row.
+- Only a callback that returns normally increases `getDeliveredCount()`. The
+  delivered prefix remains valid, each position is called at most once, and no
+  later callback is attempted after abort. The iterator may already have advanced
+  beyond the delivered prefix. A throwing callback may have side effects of its
+  own: the SDK performs no retry or rollback. The application owns traversal,
+  scheduling, persistence and recovery, including closing iterator resources.
+- Interrupts are observed between inputs, before inference/delivery and after a
+  batch, with the interrupt flag preserved and progress recorded. This cannot
+  immediately stop blocking input, user code or an entered native operation.
+  Callbacks execute without a lifecycle lock. Serialize the entire call with
+  other operations on this instance; callbacks must not close it. Concurrent
+  lifecycle coordination belongs to issue #7.
+
+The pinned upstream asset bytes and their published digests remain unchanged.
+After authentication the runtime applies an equivalent layout transformation to
+two LayerNorm reductions, and disables graph optimization that would undo it.
+This avoids ORT CPU accumulation-order differences between single and multirow
+inputs, while keeping genuine multirow inference and the `1e-5` score tolerance.
+Weights, labels and prediction rules are unchanged. The digests returned by
+`getModelInfo()` identify the bundled upstream assets. See the
+[numerical diagnosis and acceptance evidence](docs/verification-issue-6.md).
+
 ## Prediction modes
 
 Select a mode with `Magika.builder().predictionMode(PredictionMode.MEDIUM_CONFIDENCE).build()`.
@@ -201,7 +286,8 @@ until `identify` returns. The SDK neither modifies nor retains the array, and
 does not copy the entire input. It extracts head and tail features using raw
 windows of at most 4096 bytes each, 1024 tokens per end, and padding token 256.
 
-`DetectionResult`, `RawPrediction`, and `ModelInfo` are immutable Java values.
+`DetectionResult`, `RawPrediction`, `ModelInfo`, `BatchItemResult` and `BatchSummary`
+are immutable Java values.
 Results never own native handles or need closing.
 
 | Result accessor | Meaning |
@@ -234,7 +320,7 @@ strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
 
 | Failure | Public exception |
 | --- | --- |
-| Null input, null prediction mode, nonpositive thread count or negative stream limit | `IllegalArgumentException` |
+| Null input/callback/mode, invalid batch size, nonpositive thread count or negative stream limit | `IllegalArgumentException` |
 | Identification after close | `IllegalStateException` |
 | Missing, corrupt or inconsistent assets | `MagikaException`, category `ASSET_VALIDATION` |
 | Native loading, Session initialization or signature failure | `MagikaException`, category `MODEL_INITIALIZATION` |
@@ -242,6 +328,7 @@ strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
 | Stream read failure or configured stream limit exceeded | `MagikaException`, category `INPUT` |
 | Inference/output failure | `MagikaException`, category `INFERENCE` |
 | Instance resource-release failure | `MagikaException`, category `RESOURCE_RELEASE` |
+| Aborted batch (iterator, system, callback or interruption) | `BatchIdentificationException`, category `BATCH`, with stage/progress |
 
 `MagikaException` is unchecked and exposes `getCategory()`, `getContext()` and the
 original `getCause()` when one exists. Validation mismatches without an underlying
@@ -337,6 +424,14 @@ different chunk sizes, short reads, strict UTF-8 and long whitespace in all mode
 Neither these cases nor the deterministic rule tests
 establish accuracy for all 214 model classes.
 
+All 207 path references also run through `identifyAll` in the three modes, with
+exact labels/MIME/reasons and the same `1e-5` score tolerance. Mixed boundaries,
+rules, failures and duplicates are compared to single Path calls at batch sizes
+1, 7 and 32. Existing single-entry comparisons remain exact. Batch probes observe
+real ORT tensor shapes, native failures and resource closure through ORT's public
+boundary, and process 1,000,003 lazy input positions in a separate 64 MiB JVM.
+The ORT probe agent and ASM are test-only; they are absent from SDK runtime dependencies.
+
 Before upgrading the model or its companion configuration/metadata, pin the new
 asset set and upstream reference sources together, then rerun compatibility
 acceptance:
@@ -349,6 +444,8 @@ acceptance:
   feature and result equality, file errors, single-handle ownership and bounded sampling.
 - Stream equivalence for those content/path references and boundary cases, current
   position, caller ownership, read failures, size limits and the heap-limited generated stream.
+- Batch reference parity, lazy ordered delivery, file errors, abort/interruption
+  progress, native tensor/resource checks and the million-path limited-heap probe.
 - HIGH/MEDIUM below/equal/above threshold cases, per-label threshold defaults,
   mapping, text/binary fallback, unchanged-label reasons and BEST_GUESS low scores.
 - Rule short circuits for empty/short content in every mode: absent raw

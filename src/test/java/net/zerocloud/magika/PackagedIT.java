@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -178,6 +179,36 @@ public class PackagedIT {
     }
 
     @Test
+    public void realBatchShapesNativeFailuresAndResourceRelease() throws Exception {
+        Path agent = temporary.newFile("ort-probe-agent.jar").toPath();
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().putValue("Manifest-Version", "1.0");
+        manifest.getMainAttributes().putValue("Premain-Class", OrtProbeAgent.class.getName());
+        try (JarOutputStream jar = new JarOutputStream(Files.newOutputStream(agent), manifest);
+             java.util.stream.Stream<Path> classes = Files.list(Paths.get("target/test-classes/net/zerocloud/magika"))) {
+            for (Path file : (Iterable<Path>) classes::iterator) {
+                if (file.getFileName().toString().startsWith("OrtProbeAgent")) {
+                    jar.putNextEntry(new JarEntry("net/zerocloud/magika/" + file.getFileName()));
+                    Files.copy(file, jar);
+                    jar.closeEntry();
+                }
+            }
+        }
+        probe(sdkJar(), "128m", new String[] {"-javaagent:" + agent}, "batch-ort");
+    }
+
+    @Test
+    public void millionLazyPathsFitInLimitedHeapWithoutRetainingResults() throws Exception {
+        probe(sdkJar(), "64m", new String[0], "batch-large");
+    }
+
+    @Test
+    public void batchSuccessAndAbortPathsReleaseResources() throws Exception {
+        // A resident fixed heap keeps JVM heap expansion out of the native RSS trend.
+        probe(sdkJar(), "128m", new String[] {"-Xms128m", "-XX:+AlwaysPreTouch"}, "batch-resources");
+    }
+
+    @Test
     public void specialAndUnreadableFilesFailWithoutBlocking() throws Exception {
         probe(sdkJar(), "128m", new String[0], "path-errors");
     }
@@ -194,7 +225,8 @@ public class PackagedIT {
 
     @Test
     public void repeatedSequentialUseReleasesNativeResources() throws Exception {
-        probe(sdkJar(), "128m", new String[0], "resources");
+        // Keep the same RSS tolerance while removing variable heap residency.
+        probe(sdkJar(), "128m", new String[] {"-Xms128m", "-XX:+AlwaysPreTouch"}, "resources");
     }
 
     private void reject(String resource, byte[] replacement) throws Exception {
@@ -225,6 +257,9 @@ public class PackagedIT {
         classpath.append(File.pathSeparator).append(jar.toAbsolutePath());
         for (String dependency : System.getProperty("surefire.test.class.path", System.getProperty("java.class.path"))
                 .split(File.pathSeparator)) {
+            // The bytecode agent is used only by its own probe. Keep ASM off the
+            // ordinary consumer classpath (including the native-loader fd baseline).
+            if (new File(dependency).getName().startsWith("asm-") && !args[0].equals("batch-ort")) { continue; }
             if (dependency.endsWith(".jar") && !new File(dependency).getCanonicalFile().equals(sdkJar().toFile().getCanonicalFile())) {
                 classpath.append(File.pathSeparator).append(dependency);
             }

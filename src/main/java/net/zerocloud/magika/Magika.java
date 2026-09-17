@@ -3,13 +3,18 @@ package net.zerocloud.magika;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
- * Offline byte array, regular file and stream identification using the bundled standard_v3_3 model and
+ * Offline byte array, regular file, stream and lazy batch identification using the bundled standard_v3_3 model and
  * a configurable {@link PredictionMode}, defaulting to HIGH_CONFIDENCE.
  * Creating an instance eagerly validates assets and loads
  * a CPU ONNX Runtime session. Reuse instances for sequential calls.
  * Creation disables telemetry on the JVM-shared ORT environment, as upstream does.
+ * After authentication, two model reductions use an equivalent axis layout to
+ * keep single/multirow scores compatible; graph optimizations that undo this
+ * layout are disabled. Weights and bundled asset digests are unchanged.
  *
  * <p>This version requires callers to serialize identification and closing;
  * shared concurrent use and close during identification are not supported yet.
@@ -17,16 +22,19 @@ import java.nio.file.Path;
 public final class Magika implements AutoCloseable {
     private final ModelAdapter adapter;
     private final long maxStreamBytes;
+    private final int batchSize;
     private boolean closed;
 
-    private Magika(int intraOpThreads, PredictionMode predictionMode, long maxStreamBytes) {
+    private Magika(int intraOpThreads, PredictionMode predictionMode, long maxStreamBytes, int batchSize) {
         adapter = ModelAdapter.create(intraOpThreads, predictionMode);
         this.maxStreamBytes = maxStreamBytes;
+        this.batchSize = batchSize;
     }
 
     /**
      * Creates an instance with HIGH_CONFIDENCE rules, sequential graph execution,
-     * one intra-operation thread, and a 67,108,864-byte (64 MiB) stream limit.
+     * one intra-operation thread, batches of at most 32 paths, and a
+     * 67,108,864-byte (64 MiB) stream limit.
      * @return a fully initialized instance
      * @throws MagikaException if asset validation or initialization fails
      */
@@ -118,6 +126,42 @@ public final class Magika implements AutoCloseable {
     }
 
     /**
+     * Synchronously identifies a lazy sequence of regular files, delivering each
+     * outcome in input order on the calling thread. Each batch consumes at most
+     * {@link Builder#batchSize(int)} paths (default 32); only inputs needing the
+     * model enter the inference tensor. The next batch is not consumed until all
+     * current callbacks return. The SDK creates no worker pool and retains only
+     * the current batch, excluding model/ORT memory and caller-retained values.
+     *
+     * <p>File errors are delivered as failed items and processing continues.
+     * System, iterator (including null elements), or callback failures abort the
+     * call with stage and delivery progress. Only a normally returning callback
+     * counts as delivered. An aborted batch can have consumed inputs beyond that
+     * prefix. A throwing callback can already have side effects: no automatic
+     * retry or rollback occurs. The caller owns traversal, scheduling and recovery,
+     * and must close any resource underlying its iterator.
+     *
+     * <p>Interruption is checked between inputs, before inference and callbacks,
+     * and after each batch. The flag is preserved. Blocking input, user code and
+     * native inference are not forcibly stopped. Keep paths/files stable while
+     * sampled, as for {@link #identify(Path)}. Serialize this entire call with
+     * other instance operations; callbacks must not close this instance.
+     * @param paths non-null lazy input iterator; each element must be non-null
+     * @param consumer non-null callback, invoked at most once per input position
+     * @return counts of normally delivered successes and per-file failures
+     * @throws IllegalArgumentException if either argument is null
+     * @throws IllegalStateException if this instance has been closed
+     * @throws BatchIdentificationException if the call aborts
+     */
+    public BatchSummary identifyAll(Iterator<Path> paths, Consumer<BatchItemResult> consumer) {
+        if (paths == null || consumer == null) {
+            throw new IllegalArgumentException("paths and consumer must not be null");
+        }
+        if (closed) { throw new IllegalStateException("Magika is closed"); }
+        return new BatchIdentification(adapter, batchSize).run(paths, consumer);
+    }
+
+    /**
      * Reports model provenance.
      * @return immutable version and asset information, also available after close
      */
@@ -142,6 +186,7 @@ public final class Magika implements AutoCloseable {
         private int intraOpThreads = 1;
         private PredictionMode predictionMode = PredictionMode.HIGH_CONFIDENCE;
         private long maxStreamBytes = 67_108_864L;
+        private int batchSize = 32;
 
         private Builder() { }
 
@@ -179,6 +224,22 @@ public final class Magika implements AutoCloseable {
         }
 
         /**
+         * Limits paths consumed per batch, including rule results and file errors.
+         * The maximum ensures both INT32 tensor element counts and direct-buffer
+         * byte capacities fit an int. Storage grows only with actual inputs.
+         * @param size a positive size up to 262143; default 32
+         * @return this builder
+         * @throws IllegalArgumentException if size is nonpositive or exceeds tensor capacity
+         */
+        public Builder batchSize(int size) {
+            if (size <= 0 || size > ModelAdapter.MAX_BATCH_SIZE) {
+                throw new IllegalArgumentException("batchSize must be between 1 and " + ModelAdapter.MAX_BATCH_SIZE);
+            }
+            batchSize = size;
+            return this;
+        }
+
+        /**
          * Sets ONNX Runtime's intra-operation thread count. Graph execution remains sequential.
          * @param threads a positive thread count; the default is 1
          * @return this builder
@@ -198,6 +259,6 @@ public final class Magika implements AutoCloseable {
          * @return a fully initialized instance owned by the caller
          * @throws MagikaException if validation or initialization fails
          */
-        public Magika build() { return new Magika(intraOpThreads, predictionMode, maxStreamBytes); }
+        public Magika build() { return new Magika(intraOpThreads, predictionMode, maxStreamBytes, batchSize); }
     }
 }

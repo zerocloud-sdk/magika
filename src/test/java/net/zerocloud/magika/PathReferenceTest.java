@@ -45,6 +45,8 @@ public class PathReferenceTest {
         for (PredictionMode mode : PredictionMode.values()) {
             Set<String> seen = new HashSet<>();
             int modelUses = 0;
+            java.util.List<Path> paths = new java.util.ArrayList<>();
+            java.util.List<DetectionResult> singles = new java.util.ArrayList<>();
             try (Magika sdk = Magika.builder().predictionMode(mode).build()) {
                 for (JsonObject example : cases.get(mode)) {
                     String original = example.get("path").getAsString();
@@ -54,6 +56,8 @@ public class PathReferenceTest {
                     assertTrue(message, files.contains(original));
                     Path path = Paths.get(getClass().getResource("/reference/" + original).toURI());
                     DetectionResult actual = sdk.identify(path);
+                    paths.add(path);
+                    singles.add(actual);
                     maxError = Math.max(maxError,
                             Fixtures.assertReference(message, example.getAsJsonObject("prediction"), kb, actual));
                     Fixtures.assertEquivalent(message, sdk.identify(Files.readAllBytes(path)), actual);
@@ -67,6 +71,22 @@ public class PathReferenceTest {
                     if (actual.isModelUsed()) { modelUses++; }
                     count++;
                 }
+                double[] batchError = {0};
+                BatchSummary summary = sdk.identifyAll(paths.iterator(), item -> {
+                    int index = Math.toIntExact(item.getInputIndex());
+                    assertSame(paths.get(index), item.getPath());
+                    assertTrue(item.isSuccess());
+                    assertFalse(item.getError().isPresent());
+                    DetectionResult result = item.getResult().get();
+                    batchError[0] = Math.max(batchError[0], Fixtures.assertReference(mode + " batch #" + index,
+                            cases.get(mode).get(index).getAsJsonObject("prediction"), kb, result));
+                    Fixtures.assertBatchEquivalent(mode + " batch/single #" + index, singles.get(index), result);
+                });
+                assertEquals(69, summary.getDeliveredCount());
+                assertEquals(69, summary.getSuccessCount());
+                assertEquals(0, summary.getFailureCount());
+                maxError = Math.max(maxError, batchError[0]);
+                System.out.println(mode + " batch references: 69, max absolute score error=" + batchError[0]);
             }
             assertEquals(mode.toString(), files, seen);
             assertEquals(69, seen.size());

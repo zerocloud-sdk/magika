@@ -15,6 +15,8 @@ public class MagikaException extends RuntimeException {
         INPUT,
         /** Model execution or output validation failed. */
         INFERENCE,
+        /** A batch call aborted; see BatchIdentificationException for stage and progress. */
+        BATCH,
         /** Releasing instance resources failed. */
         RESOURCE_RELEASE
     }
