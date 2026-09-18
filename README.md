@@ -1,23 +1,52 @@
 # Magika Java SDK
 
-An independently maintained Java 8 SDK by ZeroCloud SDK. It identifies complete
-byte arrays, saved regular files, streams and lazy batches of paths offline using Google's bundled `standard_v3_3` Magika model and the
-official ONNX Runtime CPU dependency, version `1.30.0`.
+**English** | [简体中文](README.zh-CN.md)
 
-Version **0.1.0** is published to
-[Maven Central](https://central.sonatype.com/artifact/net.zerocloud/magika/0.1.0).
-Concurrent byte array, file, stream and batch identification support all three
-official prediction modes, defaulting to **HIGH_CONFIDENCE**.
+Identify file types from their content in Java. Independently maintained by
+ZeroCloud SDK, this library bundles Google's `standard_v3_3` Magika model for
+offline identification. It supports complete byte arrays, regular files, streams
+and ordered batches of paths, with reusable instances for concurrent requests.
 
-The [v0.1.0 Release](https://github.com/zerocloud-sdk/magika/releases/tag/v0.1.0)
-identifies the source and model assets. The [formal acceptance record](docs/verification-issue-10.md)
-includes the complete Java 8/17/21 gates, direct Central downloads, Java-only
-offline consumption, performance provenance and all 16 parent-spec acceptance items.
-The [release guide](docs/releasing.md) covers signing, publication and recovery.
+[Maven Central](https://central.sonatype.com/artifact/net.zerocloud/magika/0.1.0) ·
+[Release v0.1.0](https://github.com/zerocloud-sdk/magika/releases/tag/v0.1.0) ·
+[Supported types](docs/supported-types.md) · [Examples](examples/offline)
 
-## Install and use
+## Contents
 
-Add the published dependency to your Maven project:
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Choose an input](#choose-an-input)
+- [Configuration](#configuration)
+- [Prediction modes](#prediction-modes)
+- [Understand results](#understand-results)
+- [Handle errors](#handle-errors)
+- [Reuse instances and shut down](#reuse-instances-and-shut-down)
+- [Offline deployment and troubleshooting](#offline-deployment-and-troubleshooting)
+- [Run the examples](#run-the-examples)
+- [Versions and further reading](#versions-and-further-reading)
+- [License](#license)
+
+## Requirements
+
+| Item | Requirement |
+| --- | --- |
+| Application runtime | Java 8 compatible; verified on Java 8, 17 and 21 |
+| Verified platform | Ubuntu 24.04 x64, CPU, with ONNX Runtime 1.30.0 |
+| Runtime dependencies | Resolved transitively by Maven or Gradle |
+| Network | Needed to obtain dependencies; identification runs offline afterward |
+| Build this SDK from source | JDK 21 and Maven 3.8.7 or later; see the [development guide](docs/development.md) |
+
+Using the published dependency does not require building the SDK or installing
+Python. Other operating systems, distributions, architectures, libc versions and
+GPU execution have not been verified by this project.
+
+## Installation
+
+### Maven
+
+Add this inside your project's `<dependencies>` section. The artifact is
+published to Maven Central; no extra repository is needed.
 
 ```xml
 <dependency>
@@ -27,73 +56,93 @@ Add the published dependency to your Maven project:
 </dependency>
 ```
 
+### Gradle
+
+For `build.gradle` (Groovy DSL), in a project with the Java plugin:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.zerocloud:magika:0.1.0'
+}
+```
+
+For `build.gradle.kts` (Kotlin DSL):
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("net.zerocloud:magika:0.1.0")
+}
+```
+
+The SDK JAR contains its model assets. Keep the transitive ONNX Runtime and Gson
+dependencies on your runtime classpath; copying only the SDK JAR is insufficient.
+
+## Quick start
+
+After adding the dependency, save this as `QuickStart.java` in your application's
+source directory and run `QuickStart.main` from your IDE or build tool:
+
 ```java
 import java.nio.charset.StandardCharsets;
 import net.zerocloud.magika.DetectionResult;
 import net.zerocloud.magika.Magika;
 
-byte[] content = "%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<<>>\n%%EOF\n"
-        .getBytes(StandardCharsets.US_ASCII);
-DetectionResult result;
-try (Magika magika = Magika.create()) {
-    result = magika.identify(content);
-    System.out.println(magika.getModelInfo().getSdkVersion());
-    System.out.println(magika.getModelInfo().getModelVersion());
+public class QuickStart {
+    public static void main(String[] args) {
+        byte[] content = "%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<<>>\n%%EOF\n"
+                .getBytes(StandardCharsets.US_ASCII);
+        DetectionResult result;
+        try (Magika magika = Magika.create()) {
+            result = magika.identify(content);
+        }
+        System.out.println(result.getLabel());
+        System.out.println(result.getMimeType());
+    }
 }
-System.out.println(result.getLabel());    // pdf; usable after close
-System.out.println(result.getMimeType()); // application/pdf
 ```
 
-`Magika.builder().intraOpThreads(2).build()` configures a positive ORT
-intra-operation thread count. The default is 1; graph execution is always
-sequential. `create()` and `build()` validate all three pinned asset digests,
-configuration, ordered labels, metadata, and native model signature, and create a
-real session before returning. They do not download anything.
-Like the fixed upstream implementation, creation disables telemetry on the
-JVM-shared ORT environment; this setting also affects other users of that environment.
+Expected output:
 
-Reuse one instance across requests and threads. All `identify` overloads and
-`identifyAll` share its real ORT Session, with separate sampling, tensors and
-results for each call. The application owns request scheduling; the SDK creates
-no worker pool. Builders are not thread-safe. Keep each input stable and
-coordinate any input or callback state shared by the application.
+```text
+pdf
+application/pdf
+```
 
-## Shared lifetime and shutdown
+Results are immutable Java values and remain usable after the SDK is closed.
+In a service, create one instance at startup and reuse it across requests; see
+[lifecycle guidance](#reuse-instances-and-shut-down).
 
-The lifecycle is **OPEN → CLOSING → CLOSED**. `close()` stops admission before
-waiting. New identification calls throw `IllegalStateException` without reading
-their input or consuming their iterator. An accepted call keeps running until it
-returns or fails under its normal contract. An accepted batch includes **all
-remaining inputs and callbacks**, not just its current inference batch.
+## Choose an input
 
-Once all calls exit, close releases the Session, then SessionOptions, exactly
-once. It leaves the JVM-shared OrtEnvironment available to other instances.
-Repeated and concurrent closes wait for the same release to finish. If a closer
-is interrupted while waiting, it still finishes waiting and restores its interrupt
-flag before exit. Release failures are reported, other owned resources still get
-a cleanup attempt, and the instance stays closed. Later closes report the same
-underlying failure without retrying release. Immutable results and
-`getModelInfo()` remain usable after close.
+| Input | API | When to use it |
+| --- | --- | --- |
+| Complete content in memory | `identify(byte[])` | You already hold the complete file bytes |
+| Saved regular file | `identify(Path)` | Saved uploads or large files; reads bounded head/tail windows |
+| Caller-owned stream | `identify(InputStream)` | Request bodies or other streams; reads from the current position to EOF |
+| Lazy sequence of paths | `identifyAll(Iterator<Path>, Consumer<BatchItemResult>)` | Many files with ordered callbacks and storage bounded by the current batch |
 
-Close has no timeout and does not forcibly terminate blocking input, a user
-callback, or native inference. Configure timeouts at the input source and arrange
-for callbacks to finish. **Same-thread close from an active call** (including
-stream/file reads, iterator code and callbacks) immediately throws
-`IllegalStateException` without changing the lifecycle. Callbacks execute without
-the lifecycle lock, but must not wait for another thread to close this instance:
-close is waiting for the callback, forming a caller-created waiting cycle.
+The remaining Java snippets show imports followed by code to place inside a
+method. File and stream examples expect `uploads/completed-upload.bin` to exist;
+the batch example expects an `uploads` directory. Handle or declare the checked
+I/O exceptions from `Files` operations in your application.
 
-The [runnable shared-instance example](examples/offline/src/main/java/example/SharedInstanceExample.java)
-creates one instance, serves 16 requests on four application workers, then shuts
-down and reads a retained result. In a service, create the instance at startup,
-stop accepting application requests at shutdown, finish queued requests, and close
-the instance. A task queued on an application executor has **not** yet been
-accepted by the SDK; admission occurs when it enters an identification method.
-The standalone and isolated consumers below also run this example.
+### Complete byte arrays
 
-## Saved uploads and regular files
+The quick start uses `identify(byte[])`. Supply **complete content**, including
+its tail, and keep the array unchanged until the call returns. The SDK does not
+modify or retain the array and does not copy the entire input.
 
-Save the complete upload and finish writing before passing its `Path`:
+### Saved files
+
+Finish writing the upload before identifying it:
 
 ```java
 import java.nio.file.Path;
@@ -108,33 +157,20 @@ try (Magika magika = Magika.create()) {
 }
 ```
 
-The [runnable saved-upload example](examples/offline/src/main/java/example/SavedUploadExample.java)
-copies an application-owned upload stream into a temporary file, closes the stream,
-identifies the saved file and deletes it. It compiles against the installed SDK and
-also runs in the isolated consumer below.
+The SDK follows symbolic links and accepts only regular files. Missing,
+unreadable or non-regular inputs throw `MagikaException` with category `INPUT`.
+It opens and closes its own file handle, including on failure.
 
-`identify(Path)` follows symbolic links and accepts only regular files. Directories,
-devices and pipes are rejected before opening content; broken links, missing files
-and unreadable files fail with `MagikaException.Category.INPUT`. The exception
-includes the supplied path in `getContext()` and preserves the available original
-cause in `getCause()`. Input failures throw; they never return `unknown` or retry.
-A null `Path` throws `IllegalArgumentException`.
+There is no default file-size limit. Sampling uses head/tail windows of at most
+4096 bytes each, so sampling memory does not grow with file size. This excludes
+model/ORT memory and application buffers. Keep the file, its path and any
+symbolic-link target stable: the SDK provides no snapshot and cannot detect every
+concurrent modification. Observable read/size changes fail without retrying.
 
-The SDK opens one read handle, seeks to the head and tail, and closes its handle
-before inference, including on sampling failures. Each raw window is at most
-4096 bytes. There is no default file size limit, and sampling buffers do not grow
-with file length. This bound excludes model/ORT memory and application buffers.
-The application owns the file and must keep both its content and path stable
-throughout identification, including symbolic-link targets. The SDK provides no
-snapshot and cannot detect every concurrent modification. Observable truncation,
-read failures or size changes during sampling report input errors without retrying.
-Same-content files and complete byte arrays use the same rules in all three modes.
+See the [saved-upload example](examples/offline/src/main/java/example/SavedUploadExample.java)
+for saving an upload to a temporary file, identifying it and cleaning up.
 
-## Upload streams
-
-Pass a caller-owned `InputStream` directly to `identify`. Identification consumes
-all remaining bytes **from the current position to EOF**, using the same rules
-and returning the same result fields as a complete `byte[]` in all three modes.
+### Streams
 
 ```java
 import java.io.InputStream;
@@ -143,46 +179,34 @@ import java.nio.file.Paths;
 import net.zerocloud.magika.DetectionResult;
 import net.zerocloud.magika.Magika;
 
-// An HTTP request body can also be supplied directly as upload.
 try (InputStream upload = Files.newInputStream(Paths.get("uploads", "completed-upload.bin"));
      Magika magika = Magika.builder().maxStreamBytes(128L * 1024 * 1024).build()) {
     DetectionResult result = magika.identify(upload);
     System.out.println(result.getLabel() + " " + result.getMimeType());
-} // The application closes its stream here.
+}
 ```
 
-The default stream limit is **67,108,864 bytes (64 MiB)**. Configure a nonnegative
-`long` with `maxStreamBytes`; negative values throw `IllegalArgumentException`,
-and zero accepts only an empty remaining stream. `Long.MAX_VALUE` is supported.
-Each built instance keeps its limit even if the builder is later changed.
-The limit applies only to streams, independently of byte array and Path inputs.
+- Identification consumes all remaining bytes **from the current position to
+  EOF**. The same content produces the same result as a complete byte array.
+- The SDK **never closes or resets the stream**, even on failure. The
+  application's resource block above closes it. Arrange saving or reopening if
+  you need to read the content again.
+- The default limit is **64 MiB (67,108,864 bytes)**; this example raises it to
+  128 MiB. At most one extra byte is read to detect overflow, then an `INPUT`
+  error is thrown. The SDK never identifies a truncated prefix.
+- Sampling uses two windows of at most 4096 bytes and a 4096-byte work buffer.
+  It does not buffer the complete stream or save it to a temporary file. This
+  bound excludes model/ORT memory and caller-owned buffers.
+- Set blocking-read timeouts at the input source, such as the HTTP connection.
+  The SDK has no read timeout.
 
-At most **one extra byte** is consumed to distinguish a stream exactly at the
-limit from one that exceeds it. An oversized stream immediately throws
-`MagikaException` with category `INPUT` and `maxStreamBytes` in its context;
-the SDK stops reading and never identifies a truncated prefix. Read failures
-also throw `INPUT` and preserve the original cause. Empty content and unknown
-types remain successful results. A null stream throws `IllegalArgumentException`;
-a closed SDK rejects stream identification before any read.
+See the [stream-upload example](examples/offline/src/main/java/example/StreamUploadExample.java)
+for identifying content after an application envelope has already been read.
 
-The SDK **never closes or resets** the caller's stream, including on failure.
-The caller arranges any later replay, saving or reopening. Configure blocking
-read timeouts on the input source (for example, the HTTP connection); the SDK
-does not impose a timeout. Sampling uses head and tail windows of at most
-4096 bytes each, one fixed 4096-byte work buffer and a `long` total length.
-It never saves the complete stream in memory or a temporary file. This sampling
-memory guarantee excludes the model, ORT, caller-owned buffers and retained results.
+### Ordered batches
 
-The [runnable stream-upload example](examples/offline/src/main/java/example/StreamUploadExample.java)
-consumes an application envelope first, identifies the remaining upload, and
-closes the stream in the application's resource block. The isolated consumer
-below compiles and runs it against the installed SDK.
-
-## Ordered lazy batches
-
-`identifyAll(Iterator<Path>, Consumer<BatchItemResult>)` runs synchronously on the
-calling thread and returns `BatchSummary`. For example, the application can own
-a lazy directory traversal and its stream lifetime:
+`identifyAll` runs synchronously on the calling thread. The application supplies
+the iterator, handles each result and owns directory-traversal resources:
 
 ```java
 import java.nio.file.Files;
@@ -196,324 +220,277 @@ import net.zerocloud.magika.Magika;
 try (Stream<Path> paths = Files.walk(Paths.get("uploads"));
      Magika magika = Magika.builder().batchSize(32).build()) {
     try {
-        BatchSummary summary = magika.identifyAll(paths.iterator(), item -> {
-            if (item.isSuccess()) {
-                System.out.println(item.getInputIndex() + ": " + item.getResult().get().getLabel());
-            } else {
-                System.err.println(item.getPath() + ": " + item.getError().get().getMessage());
-            }
-        });
-        System.out.println("Delivered " + summary.getDeliveredCount() + ", successful "
-                + summary.getSuccessCount() + ", file failures " + summary.getFailureCount());
+        BatchSummary summary = magika.identifyAll(
+                paths.filter(Files::isRegularFile).iterator(), item -> {
+                    if (item.isSuccess()) {
+                        System.out.println(item.getInputIndex() + ": "
+                                + item.getResult().get().getLabel());
+                    } else {
+                        System.err.println(item.getPath() + ": "
+                                + item.getError().get().getMessage());
+                    }
+                });
+        System.out.println("Delivered " + summary.getDeliveredCount()
+                + ", successful " + summary.getSuccessCount()
+                + ", file failures " + summary.getFailureCount());
     } catch (BatchIdentificationException error) {
-        System.err.println("Aborted at " + error.getStage() + ", delivered "
-                + error.getDeliveredCount() + ", input index " + error.getInputIndex());
-        // Reconcile callback side effects and consumed input before choosing recovery.
+        System.err.println("Aborted at " + error.getStage()
+                + ", delivered " + error.getDeliveredCount()
+                + ", input index " + error.getInputIndex());
     }
 }
 ```
 
-The [runnable batch example](examples/offline/src/main/java/example/BatchExample.java)
-demonstrates successes, a missing file, duplicate paths and a throwing callback
-with exact delivery progress. It also runs in the independent offline consumer.
-Directories produced by the traversal above are delivered as per-file failures;
-the application may instead filter them when planning its input sequence.
+Results arrive in input order with a zero-based `long` index. Repeated paths are
+separate inputs. Exactly one of `item.getResult()` and `item.getError()` is
+present; `empty` and `unknown` count as successes. Per-file `INPUT` errors are
+delivered to the callback and processing continues. This example filters for
+regular files; unfiltered directories would be per-file failures.
 
-- `batchSize` defaults to **32**, including both `create()` and a default builder.
-  It must be positive and at most **262143**, so INT32 tensor element counts and
-  direct-buffer byte capacities fit an `int`. Excessive settings fail with
-  `IllegalArgumentException`; a large valid setting allocates only for actual inputs.
-  Each built instance keeps its configuration after later builder changes.
-- Each batch consumes at most that many input positions, packs only model inputs
-  into one real ORT tensor, then delivers all outcomes in original order. Repeated
-  paths retain separate zero-based `long` indices and the original `Path` objects.
-  Exactly one of `getResult()` and `getError()` is present. Empty and unknown
-  detections count as successes; unreadable/non-regular files and read/close errors
-  have category `INPUT` and processing continues.
-- No input/result history or SDK worker pool is created. Slow callbacks prevent
-  the next batch from being consumed. SDK working storage grows with the current
-  batch, excluding model/ORT allocations and values retained by the application.
-- Null iterator/consumer arguments are illegal arguments. A null iterator element,
-  iterator failure, system/inference failure or throwing callback aborts the call
-  as `BatchIdentificationException` (category `BATCH`), with the cause chain intact.
-  `getStage()` distinguishes `ITERATION`, `IDENTIFICATION`, `CALLBACK` and
-  `INTERRUPTED`. `getInputIndex()` is absent for a failed `hasNext` or a model failure
-  involving several rows; it identifies `next`, null-element, sampling or callback
-  failures, and model failures with exactly one model row.
-- Only a callback that returns normally increases `getDeliveredCount()`. The
-  delivered prefix remains valid, each position is called at most once, and no
-  later callback is attempted after abort. The iterator may already have advanced
-  beyond the delivered prefix. A throwing callback may have side effects of its
-  own: the SDK performs no retry or rollback. The application owns traversal,
-  scheduling, persistence and recovery, including closing iterator resources.
-- Interrupts are observed between inputs, before inference/delivery and after a
-  batch, with the interrupt flag preserved and progress recorded. This cannot
-  immediately stop blocking input, user code or an entered native operation.
-  Callbacks execute without a lifecycle lock and may identify other inputs while
-  the instance is open. Closing rejects nested new calls too. Callbacks must not
-  close the same instance or wait for another thread to close it.
+The SDK retains only the current batch and creates no worker pool. A slow
+callback delays consumption of the next batch. Model/ORT memory and results
+retained by the application are additional to batch working storage.
 
-The pinned upstream asset bytes and their published digests remain unchanged.
-After authentication the runtime applies an equivalent layout transformation to
-two LayerNorm reductions, and disables graph optimization that would undo it.
-This avoids ORT CPU accumulation-order differences between single and multirow
-inputs, while keeping genuine multirow inference and the `1e-5` score tolerance.
-Weights, labels and prediction rules are unchanged. The digests returned by
-`getModelInfo()` identify the bundled upstream assets. See the
-[numerical diagnosis and acceptance evidence](docs/verification-issue-6.md).
+Iterator failures, null elements, system/inference failures, throwing callbacks
+and observed interruption abort the call with `BatchIdentificationException`:
+
+| Accessor | Meaning |
+| --- | --- |
+| `getStage()` | `ITERATION`, `IDENTIFICATION`, `CALLBACK` or `INTERRUPTED` |
+| `getDeliveredCount()` | Callbacks that returned normally before the abort |
+| `getInputIndex()` | Optional failing input index; absent when no single input can be identified |
+
+Previously delivered results remain valid. The iterator may have advanced beyond
+the delivered prefix, and a throwing callback may already have side effects.
+Reconcile that state before recovery: the SDK does not retry or roll back.
+Interruptions preserve the interrupt flag and are observed between operations;
+they cannot forcibly stop blocking reads, callbacks or native inference.
+
+The [batch example](examples/offline/src/main/java/example/BatchExample.java)
+demonstrates a missing file, duplicate paths and a callback failure with exact
+delivery progress.
+
+## Configuration
+
+`Magika.create()` is equivalent to `Magika.builder().build()`.
+
+| Builder method | Default | Accepted values and effect |
+| --- | --- | --- |
+| `predictionMode(PredictionMode)` | `HIGH_CONFIDENCE` | One of the three modes below; cannot be null |
+| `maxStreamBytes(long)` | `67108864` (64 MiB) | Nonnegative; 0 accepts only empty remaining streams; `Long.MAX_VALUE` is supported; applies only to streams |
+| `batchSize(int)` | `32` | 1–262143 input positions per batch |
+| `intraOpThreads(int)` | `1` | Positive ORT intra-operation thread count; graph execution stays sequential |
+
+```java
+import net.zerocloud.magika.Magika;
+import net.zerocloud.magika.PredictionMode;
+
+try (Magika magika = Magika.builder()
+        .predictionMode(PredictionMode.HIGH_CONFIDENCE)
+        .maxStreamBytes(128L * 1024 * 1024)
+        .batchSize(32)
+        .intraOpThreads(2)
+        .build()) {
+    System.out.println(magika.getModelInfo().getSdkVersion());
+    System.out.println(magika.getModelInfo().getModelVersion());
+}
+```
+
+Builders are mutable and not thread-safe. Each built instance keeps its own
+configuration even if the builder is later changed. Invalid values throw
+`IllegalArgumentException`. Construction validates the bundled assets and
+initializes the native session before returning, with no downloads.
 
 ## Prediction modes
 
-Select a mode with `Magika.builder().predictionMode(PredictionMode.MEDIUM_CONFIDENCE).build()`.
-`Magika.create()` and a builder without an explicit mode use `HIGH_CONFIDENCE`.
-Builders are mutable and not thread-safe; each built instance keeps its own
-configuration even if the builder is later changed or reused. A null mode throws
-`IllegalArgumentException`.
-
-All modes first apply the fixed configuration's type mapping, such as
-`randomtxt` to `txt` and `randombytes` to `unknown`.
-
-| Mode | When the mapped prediction is kept |
+| Mode | When the mapped model prediction is kept |
 | --- | --- |
-| `HIGH_CONFIDENCE` | Score is at least the raw label's configured threshold; labels without one use `medium_confidence_threshold` |
-| `MEDIUM_CONFIDENCE` | Score is at least the uniform `medium_confidence_threshold`, currently 0.5 |
-| `BEST_GUESS` | Always, including low scores; type mapping still applies |
+| `HIGH_CONFIDENCE` (default) | Score meets the raw label's configured threshold; labels without one use the medium threshold |
+| `MEDIUM_CONFIDENCE` | Score meets the uniform threshold, currently 0.5 |
+| `BEST_GUESS` | Always, including low scores |
 
-HIGH/MEDIUM scores strictly below the threshold fall back to `txt` or `unknown`,
-according to the **mapped** type's text metadata. Equality keeps the mapped label.
-The thresholds come from the bundled configuration and cannot be customized.
+All modes apply the bundled type mapping, such as `randomtxt` → `txt` and
+`randombytes` → `unknown`. HIGH/MEDIUM scores strictly below the threshold fall
+back to `txt` or `unknown` according to the mapped type's text metadata.
+Equality keeps the mapped label. Thresholds cannot be customized.
+Empty-content and short-content rules behave the same in all modes.
+
+Compare the modes with an ambiguous input:
 
 ```java
 import net.zerocloud.magika.DetectionResult;
 import net.zerocloud.magika.Magika;
 import net.zerocloud.magika.PredictionMode;
 
-byte[] ambiguousContent = {0, 1, 2, 3, 4, 5, 6, 7};
+byte[] content = {0, 1, 2, 3, 4, 5, 6, 7};
 for (PredictionMode mode : PredictionMode.values()) {
     try (Magika magika = Magika.builder().predictionMode(mode).build()) {
-        DetectionResult result = magika.identify(ambiguousContent);
-        System.out.println(mode + ": raw=" + result.getRawPrediction().get().getLabel()
-                + ", final=" + result.getLabel() + ", score=" + result.getScore()
-                + ", reason=" + result.getOverwriteReason());
+        DetectionResult result = magika.identify(content);
+        System.out.println(mode + ": " + result.getLabel()
+                + " (" + result.getOverwriteReason() + ")");
     }
 }
 ```
 
-This example executes the model: the raw label is `wasm` with score about 0.3142.
-HIGH/MEDIUM return `unknown` with `LOW_CONFIDENCE`; BEST_GUESS returns `wasm`
-with `NONE`. All three retain the same raw score. The
-[standalone consumer](examples/offline/src/main/java/example/OfflineExample.java)
-compiles and runs this mode comparison alongside the default PDF example.
+```text
+HIGH_CONFIDENCE: unknown (LOW_CONFIDENCE)
+MEDIUM_CONFIDENCE: unknown (LOW_CONFIDENCE)
+BEST_GUESS: wasm (NONE)
+```
 
-## Input and results
+All three retain the same raw prediction, `wasm`, with a score of about 0.3142.
 
-`byte[]` represents **complete content**, not a header prefix. Keep it unchanged
-until `identify` returns. The SDK neither modifies nor retains the array, and
-does not copy the entire input. It extracts head and tail features using raw
-windows of at most 4096 bytes each, 1024 tokens per end, and padding token 256.
+## Understand results
 
-`DetectionResult`, `RawPrediction`, `ModelInfo`, `BatchItemResult` and `BatchSummary`
-are immutable Java values.
-Results never own native handles or need closing.
-
-| Result accessor | Meaning |
+| `DetectionResult` accessor | Meaning |
 | --- | --- |
-| `getLabel()` | Final type label, including successful `empty` and `unknown` results |
-| `getMimeType()` | Final label's MIME string from the fixed upstream metadata |
-| `getScore()` | Original top-1 model score when the model ran; otherwise the rule score 1.0 |
-| `getRawPrediction()` | `Optional<RawPrediction>` with raw label and score, empty if no inference ran |
-| `getOverwriteReason()` | `NONE`, `OVERWRITE_MAP`, or `LOW_CONFIDENCE` |
-| `isModelUsed()` | Whether this call actually ran inference |
-| `getModelVersion()` | `standard_v3_3`, independently of the SDK version |
+| `getLabel()` | Final type label, such as `pdf`, `txt`, `empty` or `unknown` |
+| `getMimeType()` | MIME string for the final label, such as `application/pdf` |
+| `getScore()` | Original top-1 model score; 1.0 when a rule returned without inference |
+| `getRawPrediction()` | `Optional<RawPrediction>` with raw label and score if the model ran |
+| `getOverwriteReason()` | `NONE`, `OVERWRITE_MAP` or `LOW_CONFIDENCE` |
+| `isModelUsed()` | Whether inference ran |
+| `getModelVersion()` | Model version, currently `standard_v3_3` |
 
-A mapped or low-confidence result retains the original top-1 score. **It is not
-the probability of the final MIME type.** Empty content and short-content rules
-have no raw prediction, `isModelUsed() == false`, score 1.0 and reason `NONE`.
-The reference data's `dl=undefined` corresponds to an empty Optional.
+**The score is not the probability of the final MIME type.** Mapping and
+low-confidence fallback keep the original top-1 score. Empty-content and
+short-content rules have score 1.0, no raw prediction, `isModelUsed() == false`
+and reason `NONE`. Check the Optional or use `ifPresent` before reading it.
 
-`OVERWRITE_MAP` means the configured mapping changed the label. `LOW_CONFIDENCE`
-means low-score rejection changed it; this reason takes precedence when both
-mapping and rejection apply. If the final label equals the raw label, the reason
-is `NONE`, even at a low score (for example, raw `txt` falling back to `txt`).
-BEST_GUESS never returns `LOW_CONFIDENCE`. Empty and short-content rules have the
-same result contract in all three modes.
+`OVERWRITE_MAP` means type mapping changed the label. `LOW_CONFIDENCE` means
+low-score rejection changed it and takes precedence if both apply. If the final
+label equals the raw label, the reason is `NONE`. `BEST_GUESS` never reports
+`LOW_CONFIDENCE`.
 
-The fixed upstream rules use strict UTF-8 decoding for short content; invalid
-UTF-8 returns `unknown`. Long leading whitespace can also select the short-content
-rule using only the first 4096-byte window. Leading head whitespace and trailing
-tail whitespace use exactly Python's six ASCII byte whitespace values. Metadata
-strings are preserved verbatim, including upstream's `text-ocaml` for OCaml.
+`unknown` means identification completed without a more specific type;
+`empty` means zero bytes. Both are successful results. See the
+[214 possible final labels](docs/supported-types.md) and their MIME strings.
+This vocabulary is not a claim of measured accuracy for every type.
 
-| Failure | Public exception |
+## Handle errors
+
+`MagikaException` is unchecked. It exposes `getCategory()`, `getContext()`
+and the original `getCause()` when available; cleanup errors can appear in
+`getSuppressed()`. Input or inference failures throw exceptions and never
+become an `unknown` detection.
+
+```java
+import java.nio.file.Paths;
+import net.zerocloud.magika.Magika;
+import net.zerocloud.magika.MagikaException;
+
+try (Magika magika = Magika.create()) {
+    System.out.println(magika.identify(Paths.get("uploads", "completed-upload.bin")).getLabel());
+} catch (MagikaException error) {
+    System.err.println(error.getCategory() + ": " + error.getContext());
+    error.printStackTrace();
+}
+```
+
+| Failure | Exception / category |
 | --- | --- |
-| Null input/callback/mode, invalid batch size, nonpositive thread count or negative stream limit | `IllegalArgumentException` |
-| Identification during/after close; same-thread close inside an accepted call | `IllegalStateException` |
-| Missing, corrupt or inconsistent assets | `MagikaException`, category `ASSET_VALIDATION` |
-| Native loading, Session initialization or signature failure | `MagikaException`, category `MODEL_INITIALIZATION` |
-| Non-regular, missing or unreadable file; sampling or file-handle close failure | `MagikaException`, category `INPUT` |
-| Stream read failure or configured stream limit exceeded | `MagikaException`, category `INPUT` |
-| Inference/output failure | `MagikaException`, category `INFERENCE` |
-| Instance resource-release failure | `MagikaException`, category `RESOURCE_RELEASE` |
-| Aborted batch (iterator, system, callback or interruption) | `BatchIdentificationException`, category `BATCH`, with stage/progress |
+| Null arguments or invalid builder values | `IllegalArgumentException` |
+| Identification during/after close, or same-thread close inside an active call | `IllegalStateException` |
+| Missing, corrupt or inconsistent assets | `MagikaException` / `ASSET_VALIDATION` |
+| Native loading, session initialization or model signature failure | `MagikaException` / `MODEL_INITIALIZATION` |
+| File/stream read failure, non-regular file, file-handle close failure or stream limit exceeded | `MagikaException` / `INPUT` |
+| Model inference or output failure | `MagikaException` / `INFERENCE` |
+| Native resource-release failure | `MagikaException` / `RESOURCE_RELEASE` |
+| Aborted batch | `BatchIdentificationException` / `BATCH`, with stage and progress |
 
-`MagikaException` is unchecked and exposes `getCategory()`, `getContext()` and the
-original `getCause()` when one exists. Validation mismatches without an underlying
-exception have no cause. Cleanup failures are preserved as suppressed exceptions.
-An initialization failure never returns a partial instance. A release failure
-leaves the instance closed. Operational failures are never disguised as `unknown`.
-Callers do not need to handle checked `OrtException`.
+For batches, handle per-file errors in the callback and aborted calls in the
+`catch` block, as shown [above](#ordered-batches).
 
-## Offline consumer and native runtime
+## Reuse instances and shut down
 
-The SDK main JAR includes the model, configuration, type metadata, asset manifest,
-license and notices. ORT and Gson remain separate, unmodified Maven dependencies;
-Gson also brings Error Prone annotations. Install those dependencies once, then
-run without network access or Python. There is no runtime asset download.
+Share one `Magika` instance across requests and threads. All identification
+methods share its native session with separate per-call sampling, tensors and
+results. The application owns scheduling, mutable inputs and callback state.
+Creation also disables telemetry on the JVM-shared ORT environment, affecting
+other users of that environment.
 
-The [standalone consumer](examples/offline) has no parent POM or dependency on
-the SDK source tree. Maven resolves its published SDK dependency from Central:
+Create the instance at service startup. At shutdown, stop accepting application
+requests, finish queued work, then call `close()`. Queuing a task does not admit
+it to the SDK; admission occurs inside an identification method.
+The [shared-instance example](examples/offline/src/main/java/example/SharedInstanceExample.java)
+serves 16 requests on four application workers and then shuts down.
+
+The lifecycle is **OPEN → CLOSING → CLOSED**. Closing rejects new identification
+calls before reading input or consuming an iterator, waits for all accepted calls
+to finish, then releases the session and its options. An accepted batch includes
+all remaining inputs and callbacks. Results and `getModelInfo()` remain usable.
+
+`close()` has no timeout and does not forcibly stop blocking input, callbacks or
+native inference. Configure input-source timeouts and allow callbacks to finish.
+Calling `close()` on the same thread inside an active call throws
+`IllegalStateException` without changing the lifecycle. A callback must also
+not wait for another thread to close the instance, which would create a deadlock.
+
+Repeated or concurrent closes share one resource release and leave the JVM-shared
+ORT environment available. An interrupted closer still waits and restores its
+interrupt flag before exit. Release failures leave the instance closed, attempt
+cleanup of the other owned resources and are reported again by later closes
+without retrying release.
+
+## Offline deployment and troubleshooting
+
+Resolve and package the SDK **and its runtime dependencies** before disconnecting
+from the network. The main JAR includes the model, configuration, type metadata,
+asset manifest and notices. ONNX Runtime, Gson and its Error Prone annotations
+dependency are separate JARs. Identification requires neither network access nor
+Python and never downloads a model.
+
+| Symptom or question | What to check |
+| --- | --- |
+| Native library fails to load | Inspect the `MODEL_INITIALIZATION` cause. ORT extracts native libraries to a writable temporary directory that must permit native loading. |
+| Need to supply native libraries yourself | `-Donnxruntime.native.path=/path/to/libraries` points to an existing compatible native-library directory; it does not select an extraction directory. |
+| A stream fails around 64 MiB | Check `maxStreamBytes`; raise the limit or finish saving the upload and identify its `Path`. |
+| Content cannot be read again after identification | The stream was consumed. Arrange replay, reopen the source or save it before identification. |
+| A result is `txt` or `unknown` | Inspect the raw prediction, mode and overwrite reason; empty/short-content rules may not run the model at all. |
+| Shutting down waits indefinitely | Check blocking input and callbacks still running; configure their timeouts and completion in the application. |
+
+Short-content rules use strict UTF-8 decoding, so invalid UTF-8 can yield
+`unknown`. MIME strings preserve the bundled metadata, including `text-ocaml`
+for OCaml.
+
+## Run the examples
+
+Clone the repository and run these commands from its root using JDK 21 and Maven.
+This builds the standalone consumer against the published dependency:
 
 ```sh
 mvn -B -ntp -f examples/offline/pom.xml clean package
-/usr/lib/jvm/java-8-openjdk-amd64/bin/java \
-  -cp 'examples/offline/target/offline-byte-array-1.0.0.jar:examples/offline/target/dependency/*' \
+java -cp 'examples/offline/target/offline-byte-array-1.0.0.jar:examples/offline/target/dependency/*' \
   example.OfflineExample
-bash scripts/verify-offline.sh /usr/lib/jvm/java-8-openjdk-amd64
 ```
 
-The last command requires Ubuntu's `sudo`, `unshare`, `chroot`, `rsync`, `unzip`
-and `ldd`, plus `ip` from iproute2. It creates a temporary Java-only root containing a JVM, required
-native libraries, packaged consumer and runtime dependencies; it starts a fresh
-network namespace with no external interface. Python and Maven are absent.
-Only this verification harness needs those Linux tools or privilege; the SDK
-needs neither. The script removes its temporary root after execution.
+The classpath command targets the verified Linux environment. The consumer runs
+byte-array, saved-upload, stream, batch, shared-instance and prediction-mode
+examples. To use another installed JVM, replace `java` with its `bin/java`.
 
-The default ORT loader extracts native libraries to a writable temporary directory
-and loads them through JNI. That location must permit native loading. The ORT
-property `onnxruntime.native.path` can instead point to an existing compatible
-native-library directory; it is not an extraction-directory setting. Native
-loading errors retain their cause in `MagikaException`.
+## Versions and further reading
 
-## Verification and provenance
+`getModelInfo()` reports SDK version, model version, upstream commit and an
+immutable asset-digest map. SDK **0.1.0** bundles model **standard_v3_3**; these are
+separate version identifiers. Model assets ship with the SDK, and model/rule
+updates require compatibility verification and a new SDK release.
 
-Build from source with JDK 21 and Maven 3.8.7 or later. Compilation uses
-`--release 8`, including the Java 8 standard API check. `mvn -B -ntp clean install`
-builds, tests and installs the local SDK. For byte-identical release artifacts,
-use the pinned Temurin 21.0.12.1+1 compiler described in the release guide.
+Fixes increment the patch version. New capabilities, model/rule updates and
+breaking 0.x API changes increment at least the minor version; breaking changes
+include migration notes. Published coordinates are never replaced.
 
-`mvn verify` is the acceptance entry point: Java tests read the original static
-gzip fixtures, exercise real ORT, validate packaged resources and bytecode, reject
-altered assets, and run separate JVM probes for bounded input copying, native
-thread configuration, sequential native resource reuse, a file and a generated stream
-larger than the heap and the `int` range, input errors and owned file handles.
-Stream and special-file probes have a process timeout;
-permission checks require a real denied open by an unprivileged test user.
-Javadoc generation
-also runs and rejects documentation warnings. No Python generation step is used.
+- [Supported labels and MIME types](docs/supported-types.md)
+- [Development, verification and model provenance](docs/development.md) (English)
+- [Release and publication guide](docs/releasing.md) (English)
+- [0.1.0 acceptance record](docs/verification-issue-10.md) (English)
+- [Performance measurements](docs/performance/issue-8-v1.md) (English; applies to the recorded environment and corpus)
+- [Report an issue](https://github.com/zerocloud-sdk/magika/issues)
 
-To build with JDK 21 and really execute all tests and native inference on each
-installed Java version:
+Public Javadoc is included in the published Javadoc JAR and generated locally at
+`target/reports/apidocs/` when building the SDK.
 
-```sh
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-mvn -B -ntp clean
-for runtime in 8 17 21; do
-  mvn -B -ntp -Dtest.java.home="/usr/lib/jvm/java-$runtime-openjdk-amd64" verify
-  mkdir -p "target/verification/java-$runtime"
-  cp -R target/surefire-reports target/failsafe-reports "target/verification/java-$runtime/"
-done
-```
+## License
 
-The test logs print the actual runtime version, vendor, home, OS/architecture and
-native ORT version. [CI](.github/workflows/verify.yml) uses Ubuntu 24.04 x64, JDK 21
-for compilation, separate Java 8/17/21 test JVMs, and the isolated packaged consumer.
-The [stream verification record](docs/verification-issue-5.md),
-[regular-file verification record](docs/verification-issue-4.md),
-[prediction-mode verification record](docs/verification-issue-3.md) and
-[initial SDK verification record](docs/verification-issue-2.md) record executed checks and
-limits. Platform evidence is limited to Ubuntu 24.04 x64 / CPU; other distributions,
-architectures, libc versions and GPU execution are not verified.
-
-The [asset manifest](src/main/resources/net/zerocloud/magika/model/asset-manifest.json)
-records the fixed upstream commit, model contract, exact byte sizes, sources,
-SHA-256 digests, license, and both original feature/content reference datasets.
-The separate [path manifest](src/test/resources/reference/path-manifest.json)
-pins the path reference and all 69 original files to the same upstream commit,
-with per-file sources, sizes and SHA-256 digests. All references and original
-input files are test-only and excluded from the production JAR. The 9,261
-feature cases use head 128, tail 64 and window 512; separate boundary tests cover
-the actual model's 1024/1024 and 4096 configuration. All 141 content cases are
-checked through the public API, exactly 47 per mode, with exact raw/final labels,
-overwrite reasons and MIME strings, and absolute score error at most `1e-5`.
-All 207 path cases are checked through public `identify(Path)`, exactly 69 per mode,
-against both the fixed reference and complete `byte[]` results. Boundary cases
-also compare their exact features through the restricted feature contract.
-All 141 content references and the contents of all 207 path references also run
-through public `identify(InputStream)`, with exact result equality to the other
-entry points and the same official score tolerance. Stream boundaries cover
-different chunk sizes, short reads, strict UTF-8 and long whitespace in all modes.
-Neither these cases nor the deterministic rule tests
-establish accuracy for all 214 model classes.
-
-The [supported final-label list](docs/supported-types.md) is derived from the
-authenticated model vocabulary, its type mapping, short-content rules and
-confidence fallbacks. It contains 214 possible final labels; the 353-entry
-knowledge base is not the support list. `randombytes` and `randomtxt` appear only
-as raw predictions, mapped to `unknown` and `txt` in every prediction mode.
-
-All 207 path references also run through `identifyAll` in the three modes, with
-exact labels/MIME/reasons and the same `1e-5` score tolerance. Mixed boundaries,
-rules, failures and duplicates are compared to single Path calls at batch sizes
-1, 7 and 32. Existing single-entry comparisons remain exact. Batch probes observe
-real ORT tensor shapes, native failures and resource closure through ORT's public
-boundary, and process 1,000,003 lazy input positions in a separate 64 MiB JVM.
-The ORT probe agent and ASM are test-only; they are absent from SDK runtime dependencies.
-
-Shared-instance tests compare every result field across four concurrent entry
-points in all modes, preserving exact single-entry comparisons and the batch
-score tolerance. Controlled reads, iterators, callbacks and public ORT boundaries
-verify full-call draining, untouched rejection, reentrancy, interrupted and
-concurrent closers, per-call tensor/result ownership, initialization cleanup and
-release failures. See the [concurrency verification record](docs/verification-issue-7.md).
-
-The [standalone measurement tool](benchmarks/README.md) runs complete public SDK
-Path, InputStream, lazy batch and shared-instance workloads. The
-[versioned performance and resource report](docs/performance/issue-8-v1.md)
-includes measured throughput, separately defined latency metrics, Java heap and
-process observations, raw evidence and reproduction commands. Its figures apply
-to the recorded corpus and environment; they are not a fixed performance SLA.
-
-Before upgrading the model or its companion configuration/metadata, pin the new
-asset set and upstream reference sources together, then rerun compatibility
-acceptance:
-
-- All official feature references (currently 9,261), plus actual model window,
-  padding, whitespace and strict UTF-8 boundaries.
-- All content references in each of the three modes (currently 141, 47 per mode),
-  checking raw/final labels, reasons, MIME and the `1e-5` score tolerance.
-- All 207 path references and 69 authenticated original files, plus Path/byte[]
-  feature and result equality, file errors, single-handle ownership and bounded sampling.
-- Stream equivalence for those content/path references and boundary cases, current
-  position, caller ownership, read failures, size limits and the heap-limited generated stream.
-- Batch reference parity, lazy ordered delivery, file errors, abort/interruption
-  progress, native tensor/resource checks and the million-path limited-heap probe.
-- Shared Session concurrent inference, full-call close draining, reentrant close,
-  interrupted/concurrent closers, release failure convergence and resource isolation.
-- HIGH/MEDIUM below/equal/above threshold cases, per-label threshold defaults,
-  mapping, text/binary fallback, unchanged-label reasons and BEST_GUESS low scores.
-- Rule short circuits for empty/short content in every mode: absent raw
-  prediction, score 1.0, no model use and reason `NONE`; original scores after rewrites.
-- The real Java 8/17/21 CPU/ORT `mvn verify` matrix on Ubuntu 24.04 x64, including
-  asset/signature validation, packaged artifacts, strict Javadoc and the standalone
-  consumer with no network or Python. Compile with JDK 21 targeting Java 8.
-
-`getModelInfo()` separately reports SDK version, model version, upstream commit and
-an unmodifiable filename-to-SHA-256 map. Model or rule changes require compatibility
-verification and a new SDK version; the model is not a separate Maven artifact.
-Version policy: fixes increment the patch; new capabilities, model/rule updates,
-and breaking 0.x APIs increment at least the minor version, with migration notes
-for breaking changes. Published coordinates must never be replaced.
-
-Public Javadoc is generated in `target/reports/apidocs/` and the Javadoc JAR.
-Own code and Google Magika adaptations/assets are under [Apache-2.0](LICENSE);
-see [NOTICE](NOTICE) for upstream attribution. This SDK is not a Google product.
+Own code and Google Magika adaptations/assets are under [Apache-2.0](LICENSE).
+See [NOTICE](NOTICE) for upstream attribution. This SDK is independently
+maintained by ZeroCloud SDK and is not a Google product.
